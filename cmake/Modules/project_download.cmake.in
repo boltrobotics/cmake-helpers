@@ -1,0 +1,16 @@
+cmake_minimum_required(VERSION 3.5)
+project(${PREFIX} NONE)
+
+include(ExternalProject)
+ExternalProject_Add(${PREFIX}
+  GIT_REPOSITORY    ${URL}
+  GIT_TAG           master
+  ${SOURCE_DIR}
+  ${BINARY_DIR}
+  ${CONFIG_CMD}
+  ${BUILD_CMD}
+  ${BUILD_IN}
+  ${INSTALL_CMD}
+  ${TEST_CMD}
+  ${LOG_BUILD}
+)
