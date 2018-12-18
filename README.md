@@ -7,10 +7,10 @@ Cmake modules containing common functionality between projects
 * [freertos.cmake](#freertos.cmake)
 * [gtest.cmake](#gtest.cmake)
 * [init.cmake](#init.cmake)
-* [project_download.cmake.in.cmake](#project_download.in.cmake)
-* [project_setup.cmake.cmake](#project_setup.cmake)
-* [stm32f103c8t6.cmake.cmake](#stm32f103c8t6.cmake)
-* [unit_test.cmake.cmake](#unit_test.cmake)
+* [project_download.in.cmake](#project_download.in.cmake)
+* [project_setup.cmake](#project_setup.cmake)
+* [stm32f103c8t6.cmake](#stm32f103c8t6.cmake)
+* [unit_testing.cmake](#unit_testing.cmake)
 
 ## <a name="firmware.cmake"></a>firmware.cmake
 Adds custom targets for building STM32 blue/black pill firmware with st-flash
