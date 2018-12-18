@@ -1,6 +1,3 @@
-# cmake-helpers
-Cmake modules containing common functionality between projects
-
 # Table of Contents
 
 * [firmware.cmake](#firmware.cmake)
