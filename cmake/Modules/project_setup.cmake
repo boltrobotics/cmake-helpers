@@ -14,7 +14,7 @@ function(download_project)
   set(PREFIX "${p_PREFIX}")
   set(HOME "${p_HOME}")
   set(URL "${p_URL}")
-  set(SOURCE_DIR "SOURCE_DIR  \"${p_HOME}\"")
+  set(SOURCE_DIR "SOURCE_DIR  \"${p_SRC_DIR}\"")
 
   # BUILD_IN and BINARY_DIR are mutually exclusive
   #
