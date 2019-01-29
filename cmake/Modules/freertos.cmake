@@ -53,12 +53,14 @@ endif ()
 
 if (NOT FREERTOS_SRC_FILES)
   set(FREERTOS_SRC_FILES
-    croutine.c
-    event_groups.c
+    # These are always required
     list.c
     queue.c
-    stream_buffer.c
     tasks.c
+    # Add these as needed
+    croutine.c
+    event_groups.c
+    stream_buffer.c
     timers.c
   )
 endif ()
