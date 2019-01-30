@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Copyright (C) 2019 Bolt Robotics <info@boltrobotics.com>
-# License: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
 # Define a directory for third-party libraries.
 if [ -z ${XTRA_HOME} ]; then
   XTRA_HOME=${PWD}/../xtra
@@ -44,7 +41,7 @@ do
     p) BOARD_PORT="${OPTARG}";;
     u) PULL_XTRA_LIBS=1;;
     h) help; exit 0;;
-    \?) echo "Invalid option: ${Option}"; help; exit ${E_OPTERROR};;
+    \?) help; exit 22;;
   esac
 done
 

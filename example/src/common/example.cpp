@@ -2,7 +2,9 @@
 // License: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
 // SYSTEM INCLUDES
+#ifdef x86
 #include <iostream>
+#endif
 
 // PROJECT INCLUDES
 #include "example.hpp"  // class implemented
@@ -26,7 +28,11 @@ Example::~Example()
 
 bool Example::hello()
 {
+#ifdef x86
   std::cout << "Hello" << std::endl;
+#elif avr
+#elif stm32
+#endif
   return true;
 }
 

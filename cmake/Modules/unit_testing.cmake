@@ -1,9 +1,7 @@
-string(COMPARE EQUAL "${BOARD_FAMILY}" x86 _cmp)
+option(ENABLE_TESTS "Build unit tests" OFF)
 
+string(COMPARE EQUAL "${BOARD_FAMILY}" x86 _cmp)
 if (_cmp)
-  if (NOT ENABLE_TESTS)
-    set(ENABLE_TESTS ON)
-  endif()
 
   if (ENABLE_TESTS)
     enable_testing()
