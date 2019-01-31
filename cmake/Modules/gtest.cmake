@@ -15,6 +15,10 @@ else ()
   # Prevent overriding the parent project's compiler/linker settings on Windows
   set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
-  add_project(PREFIX gtest URL "https://github.com/google/googletest.git" HOME "${GTEST_HOME}"
+  add_project(
+    PREFIX gtest
+    URL "https://github.com/google/googletest.git"
+    HOME "${GTEST_HOME}"
     INC_DIR "${GTEST_HOME}/googletest/include")
+
 endif ()

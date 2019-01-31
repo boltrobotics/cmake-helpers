@@ -25,7 +25,7 @@ add_definitions(-D${BOARD_FAMILY})
 add_compile_options(-Wall -Wextra)
 
 generate_arduino_firmware(
-	${PROJECT_NAME}
+  ${PROJECT_NAME}
   BOARD ${BOARD}
   BOARD_CPU ${BOARD_CPU}
   PORT ${BOARD_PORT}

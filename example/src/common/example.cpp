@@ -2,8 +2,10 @@
 // License: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
 // SYSTEM INCLUDES
-#ifdef x86
+#if defined(x86)
 #include <iostream>
+#elif defined(avr)
+#include <Arduino.h>
 #endif
 
 // PROJECT INCLUDES
@@ -20,18 +22,15 @@ Example::Example()
 {
 }
 
-Example::~Example()
-{
-}
-
 //============================================= OPERATIONS =========================================
 
 bool Example::hello()
 {
-#ifdef x86
+#if defined(x86)
   std::cout << "Hello" << std::endl;
-#elif avr
-#elif stm32
+#elif defined(avr)
+  Serial.println("Hello");
+#elif defined (stm32)
 #endif
   return true;
 }

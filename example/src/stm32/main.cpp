@@ -8,6 +8,7 @@
 #include <libopencm3/stm32/gpio.h>
 
 // PROJECT INCLUDES
+#include "example.hpp"
 
 // For built-in LED in BlackPill use GPIOB, GPIO12, in BluePill GPIOC, GPIO13
 //
@@ -46,8 +47,11 @@ void vApplicationStackOverflowHook(xTaskHandle *pxTask, signed portCHAR *pcTaskN
 
 static void task1(void* args __attribute((unused)))
 {
+  btr::Example example;
+
   for (;;) {
     gpio_toggle(port, pin);
+    example.hello();
     vTaskDelay(pdMS_TO_TICKS(1000));
   }
 }

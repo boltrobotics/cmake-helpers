@@ -27,11 +27,6 @@ public:
     */
   Example();
 
-  /**
-    * Dtor.
-    */
-  virtual ~Example();
-
 // OPERATIONS
 
   bool hello();

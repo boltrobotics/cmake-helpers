@@ -54,7 +54,7 @@ else ()
   string(COMPARE EQUAL "${BOARD_FAMILY}" avr _cmp)
   if (_cmp)
 
-		set(TOOLCHAIN_FILE $ENV{ARDUINOCMAKE_HOME}/cmake/ArduinoToolchain.cmake)
+    set(TOOLCHAIN_FILE $ENV{ARDUINOCMAKE_HOME}/cmake/ArduinoToolchain.cmake)
     set(BOARD $ENV{BOARD})
     set(BOARD_CPU $ENV{BOARD_CPU})
     set(BOARD_PORT $ENV{BOARD_PORT})

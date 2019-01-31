@@ -20,13 +20,13 @@ BOARD_PORT=""
 help()
 {
   echo "Usage: `basename $0` [-x] [-s] [-a] [-b _board_] [-c _board_cpu_] [-p _serial_port_] [-u] [-h]"
-  echo -e "\t-x - build x86 artifacts"
-  echo -e "\t-s - build stm32 firmware (chip stm32f103c8t6)"
-  echo -e "\t-a - build avr firmware. Must specify board"
-  echo -e "\t-b - board (e.g. uno, mega)"
-  echo -e "\t-c - board CPU (e.g. atmega328, atmega2560)"
+  echo -e "\t-x - build x86"
+  echo -e "\t-s - build stm32 (board stm32f103c8t6)"
+  echo -e "\t-a - build avr (must specify board)"
+  echo -e "\t-b - board (uno, mega, etc.)"
+  echo -e "\t-c - board CPU (atmega328, atmega2560, etc.)"
   echo -e "\t-p - board serial port (e.g. /dev/ttyACM0)"
-  echo -e "\t-u - pull required extra libraries from github"
+  echo -e "\t-u - clone/pull dependencies from github"
   echo -e "\t-h - this help"
 }
 
@@ -63,8 +63,8 @@ function clone_or_pull {
 if [ "${PULL_XTRA_LIBS}" -eq 1 ]; then
   clone_or_pull "${GTEST_HOME}" "https://github.com/google/googletest.git"
   clone_or_pull "${ARDUINOCMAKE_HOME}" "https://github.com/queezythegreat/arduino-cmake.git"
-  clone_or_pull "${LIBOPENCM3_HOME}" "https://github.com/libopencm3/libopencm3.git"
   clone_or_pull "${STM32CMAKE_HOME}" "https://github.com/boltrobotics/stm32-cmake.git"
+  clone_or_pull "${LIBOPENCM3_HOME}" "https://github.com/libopencm3/libopencm3.git"
 fi
 
 if [ ${BUILD_X86} -eq 1 ]; then
