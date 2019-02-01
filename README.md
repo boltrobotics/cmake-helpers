@@ -106,8 +106,9 @@ For example, to build programs for all three platforms, run:
 ./make.sh -x -s -a -b mega -c atmega2560 -p /dev/ttyACM0 -- -DENABLE_TESTS=ON
 ```
 
-The script creates three directories, cmake generates Makefiles for corresponding toolchains
-within them, and make initiates the build in each of the directories:
+The script creates the following three directories. Cmake then generates the builds
+for corresponding toolchains within them. Lastly, make tool initiates the build in
+each of the directories:
 ```
 example/
 |-- ...
@@ -166,16 +167,16 @@ Usage: make.sh [-x] [-s] [-a] [-b _board_] [-c _board_cpu_] [-p _serial_port_] [
 
 * -x, -s, -a<br>
 Specify one or all options to build artifacts for the corresponding platform
-* -b<br>
-When building for AVR platform (-a), this option specifies a target board. To see a complete list of the
-boards supported by arduino-sdk, uncomment instruction "print_board_list()" in
+* -b <br>
+When building for AVR platform (-a), this option specifies a target board. To see a complete list of
+the boards supported by arduino-sdk, uncomment instruction "print_board_list()" in
 [example/avr/CMakeLists.txt](#avr_CMakeLists.txt)
-* -c<br>
+* -c <br>
 Some AVR boards have different CPUs (e.g. mega), -c option specifies which CPU the board uses.
 ArduinoToolchain will offer suggestions when it requires that parameter
-* -p<br>
+* -p <br>
 Specify a serial port where AVR device is connected to
-* -u - clone/pull dependencies from GitHub<br>
+* -u <br>
 When specified, the script will try to pull the changes for the above libraries from GitHub.
 Alternatively, module [project_setup.cmake](#project_setup.cmake) can achieve similar
 goal but as part of the building process
@@ -268,7 +269,7 @@ include(init)
 #print_board_list()
 ```
 
-Note, ```${PROJECT_NAME}``` was passed in, but ```$ENV{CMAKEHELPERS_HOME}``` is still read
+Note, ```${PROJECT_NAME}``` was passed in, but ```$ENV{CMAKEHELPERS_HOME}``` is read
 from the environment.
 
 Next, cmake executes usual instructions when setting up source files for compilation:
@@ -293,13 +294,13 @@ Additionally, stm32/CMakeLists.txt introduces the use of
 [project_setup.cmake](#project_setup.cmake), [freertos.cmake](#freertos.cmake), and
 [stm32f103c8t6.cmake](#stm32f103c8t6.cmake).
 
-The firmware for stm32f103c8 relies on
+The firmware for stm32f103c8 depends on
 <a href="https://github.com/libopencm3/libopencm3.git" target="_blank">libopencm3</a> library.
-Before the firmware can use it, the library must be built using make. One option is download the
-library and build it manually. Another is to use [project_setup.cmake](#project_setup.cmake)
+Before the firmware can use it, libopencm3 must be built using ```make```. One option to achieve it is to
+download and build the library manually. Another is to use [project_setup.cmake](#project_setup.cmake)
 module which can automate the process a bit more.
 
-Another library that the firmware uses is
+Another library that the firmware depends on is
 <a href="https://www.freertos.org/" target="_blank">FreeRTOS</a>, which has its own usage
 requirements. See [freertos.cmake](#freertos.cmake) for details.
 
@@ -317,7 +318,7 @@ The file instructs cmake to set up the sources, library and executable for build
 
 ### <a name="unit_CMakeLists.txt" href="example/test/CMakeLists.txt">example/test/CMakeLists.txt</a>
 
-The file instructs cmake on where to find and how to build unit tests. Here, it includes
+The file instructs cmake on where to find and how to build unit tests. Cmake instructions include
 [gtest.cmake](#gtest.cmake) in order to locate, download, and build googletest framework
 along with the unit test sources.
 
@@ -361,8 +362,8 @@ add_project(
 The module is used to set up external cmake/make project for use by a current project. It involves:
 * downloading the files from external source such as GitHub
 * exporting of source, header and/or built library names and locations
-* adding targets, which are defined by the external project, to global scope. To see all targets
-after cmake completes, change into one of build-\* directories and type: ```make help```
+* adding targets, which are defined by the external project, to global scope. To see all available
+targets after cmake completes, change into one of build-\* directories and type: ```make help```
 
 Note, project_setup uses <a href="https://cmake.org/cmake/help/latest/module/ExternalProject.html"
 target="_blank">ExternalProject</a> module. Many concepts can be clarified by reading that module's
@@ -401,9 +402,9 @@ content into that location using download_project() function defined in the same
 * BUILD_IN is used to build projects in-source
 * LIB_DIR specifies of where the built library will be stored so as to export proper
 ```${${PREFIX}_LIB_DIR}``` location
-* LIB_NAME is required if the project's library name is non-standard. Usually a library is named
-after project's name, i.e. ```${PREFIX}``` (excluding lib prefix and extension). In case of
-libopencm3, the name for stm32f103c8t6 board is ```libopencm3_stm32f1.a```
+* LIB_NAME is required if the project's library name is non-standard. Often a library can be
+referred to (in Cmake) by project's name, i.e. ```${PREFIX}```. In case of libopencm3, the
+library name for use with stm32f103c8t6 board is ```libopencm3_stm32f1.a```
 
 ### <a name="project_download.cmake.in" href="cmake/Modules/project_download.cmake.in">project_download.cmake.in</a>
 
