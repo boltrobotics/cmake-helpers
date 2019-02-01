@@ -1,7 +1,7 @@
 # Introduction
 
-The repository contains CMake modules and example files which help to save time when
-setting up new C/C++ projects. The main goal is to resuse working solutions to common
+The repository contains Cmake modules and example files which help to save time when
+setting up new C/C++ projects. The main goal is to reuse working solutions to common
 problems such as:
 
 * Combining of cross-compilation for AVR / STM32F103 with unit testing on x86 platform
@@ -9,24 +9,24 @@ problems such as:
 * Setting up paths to headers, sources and libraries
 * Re-typing boilerplate code around initialization and checks
 * Cluttering build files with large, duplicated blocks of instructions
-* Recurrent research and refresh of information about CMake
+* Recurrent research and refresh of information about Cmake
 
-#### Platforms and requirements
+### Platforms and requirements
 
-An example project was tested on MacOS and Linux. Depending on host and target platforms, not all
-the dependencies given below may apply.
+The [example](#Example) project was tested on MacOS and Linux. Depending on host and target
+platforms, not all the dependencies given below may apply.
 
-Most of the packages can be installed using system package manager or supplimental tools like
-brew on MacOS. When a package manager doesn't support a package, the packge is downloaded from
-github (for example, gtest, stm32-cmake) or directly from developer's website (for example,
-arm gnu embedded toolchain, FreeRTOS).
+Most of the packages can be installed using system package manager or supplemental tools like
+brew on MacOS. When a package manager doesn't support a package, the package is downloaded from
+GitHub (for example, gtest, stm32-cmake) or directly from developer's website (for example,
+Arm GNU Embedded Toolchain, FreeRTOS).
 
 * x86 software/host platform
   * <a href="https://en.wikipedia.org/wiki/Xcode" target="_blank">Xcode (MacOS)</a>
   * build-essential (Linux)
-  * <a href="https://cmake.org/" target="_blank">CMake</a>
+  * <a href="https://cmake.org/" target="_blank">Cmake</a>
   * <a href="https://www.boost.org/" target="_blank">Boost</a>
-  * <a href="https://github.com/google/googletest.git" target="_blank">googletest</a>
+  * <a href="https://github.com/google/googletest.git" target="_blank">Google Test</a>
 * To build AVR firmware
   * <a href="https://github.com/queezythegreat/arduino-cmake.git" target="_blank">arduino-cmake</a>
   * <a href="https://www.arduino.cc/en/Main/Software" target="_blank">arduino-sdk</a>
@@ -48,28 +48,30 @@ arm gnu embedded toolchain, FreeRTOS).
   * [example/src/avr/CMakeLists.txt](#avr_CMakeLists.txt)
   * [example/src/stm32/CMakeLists.txt](#stm32_CMakeLists.txt)
   * [example/src/x86/CMakeLists.txt](#x86_CMakeLists.txt)
+  * [example/test/CMakeLists.txt](#unit_CMakeLists.txt)
   * [init.cmake](#init.cmake)
-  * [firmware.cmake](#firmware.cmake)
-  * [freertos.cmake](#freertos.cmake)
+  * [unit_testing.cmake](#unit_testing.cmake)
   * [gtest.cmake](#gtest.cmake)
   * [project_setup.cmake](#project_setup.cmake)
   * [project_download.cmake.in](#project_download.cmake.in)
+  * [firmware.cmake](#firmware.cmake)
+  * [freertos.cmake](#freertos.cmake)
   * [stm32f103c8t6.cmake](#stm32f103c8t6.cmake)
-  * [unit_testing.cmake](#unit_testing.cmake)
 * [Contribute](#Contribute)
 
 # <a name="Example"></a>Example
 
-Directory ["example"](example/) represents a hypotethical cross-compilation project. Within it:
+Directory ["example"](example/) represents an example cross-compilation project. Within it:
 
 * src/avr/main.cpp <br>
   Uses Arduino library to blink a built-in LED and call a function Example::hello() while running
-  on AVR-based microcontroller such as ATmega2560 
+  on AVR-based microcontroller
 * src/stm32/main.cpp <br>
-  Uses libopencm3 and starts FreeRTOS task to blink a built-in LED and call Example::hello() while
-  running on STM32F103C8T6 (aka Blue Pill)
+  Uses libopencm3 and FreeRTOS to start a task which blinks a built-in LED and calls Example::hello()
+  while running on STM32F103C8 microcontroller (aka
+  <a href="https://wiki.stm32duino.com/index.php?title=Blue_Pill" target="_blank">Blue Pill</a>)
 * src/x86/main.cpp <br>
-  Just calls Example::hello() while running on MacOS or Linux
+  Calls Example::hello() while running on MacOS or Linux
 
 Project structure:
 ```
@@ -98,13 +100,14 @@ example/
     |-- example_test.cpp
 ```
 
-Once the environment is set up (see [Details](#Details)), start the build with [make.sh](#make.sh)
-for all three platforms:
+To start cmake build, the project provides bash script [make.sh](#make.sh).
+For example, to build programs for all three platforms, run:
 ```
 ./make.sh -x -s -a -b mega -c atmega2560 -p /dev/ttyACM0 -- -DENABLE_TESTS=ON
 ```
 
-The script creates three directories where it builds the artifacts using proper toolchain:
+The script creates three directories, cmake generates Makefiles for corresponding toolchains
+within them, and make initiates the build in each of the directories:
 ```
 example/
 |-- ...
@@ -114,24 +117,26 @@ example/
 |-- ...
 ```
 
-To upload just-built firmware to a connected board, change into build-avr or build-stm32 and
-execute:
+To upload just-built firmware to a connected board, change into ```build-avr``` or
+```build-stm32``` and execute:
 ```
 make flash
 ```
 
-To run unit test which is defined in example_test.cpp, change into build-x86 and execute:
+To run an example unit test which is defined in ```test/example_test.cpp```, change into
+```build-x86``` and execute:
 ```
 make test
 ```
 
 # <a name="Details"></a>Details
 
-#### <a href=example/make.sh name="make.sh">example/make.sh</a>
+### <a href=example/make.sh name="make.sh">example/make.sh</a>
 
-The script makes it convenient to set up the environment and pass required parameters to cmake.
+The script makes it convenient to set up the environment and pass the required parameters to cmake
+program.
 
-Example project and cmake modules use specific variables from the environment. One such set
+Example project and Cmake modules use specific variables from the environment. One such set
 includes the locations of dependent libraries. The locations should be changed to reflect
 personal preference:
 ```bash
@@ -155,30 +160,39 @@ Usage: make.sh [-x] [-s] [-a] [-b _board_] [-c _board_cpu_] [-p _serial_port_] [
         -b - board (uno, mega, etc.)
         -c - board CPU (atmega328, atmega2560, etc.)
         -p - board serial port (e.g. /dev/ttyACM0)
-        -u - clone/pull dependencies from github
+        -u - clone/pull dependencies from GitHub
         -h - this help
 ```
 
 * -x, -s, -a<br>
-Specify one or all to build artifacts for corresponding platform
+Specify one or all options to build artifacts for the corresponding platform
 * -b<br>
-When building AVR target (-a), this option specifies a target board. To see a complete list of the
+When building for AVR platform (-a), this option specifies a target board. To see a complete list of the
 boards supported by arduino-sdk, uncomment instruction "print_board_list()" in
 [example/avr/CMakeLists.txt](#avr_CMakeLists.txt)
 * -c<br>
-Some AVR boards have different CPUs (e.g. mega), -c option specifies which CPU the board uses
-* -u - clone/pull dependencies from github<br>
-When specified, the script will try to pull the changes for the above libraries from github.
+Some AVR boards have different CPUs (e.g. mega), -c option specifies which CPU the board uses.
+ArduinoToolchain will offer suggestions when it requires that parameter
+* -p<br>
+Specify a serial port where AVR device is connected to
+* -u - clone/pull dependencies from GitHub<br>
+When specified, the script will try to pull the changes for the above libraries from GitHub.
 Alternatively, module [project_setup.cmake](#project_setup.cmake) can achieve similar
 goal but as part of the building process
 
-#### <a name="CMakeLists.txt" href="example/CMakeLists.txt">example/CMakeLists.txt</a>
+### <a name="CMakeLists.txt" href="example/CMakeLists.txt">example/CMakeLists.txt</a>
 
-When cmake is invoked, this CMakeLists.txt is the first file it loads. After the version and
-project preamble, the file sets the path to modules and loads [init.cmake](#init.cmake), 
+Cmake processes this file first. It contains three decision branches for generating avr, stm32
+or x86 builds.
+
+Instructions in the file start with a regular version/project preamble. Next, the file sets
+the path to modules and instructs to include [init.cmake](#init.cmake),
 [firmware.cmake](#firmware.cmake) and [unit_testing.cmake](#unit_testing.cmake) modules:
 
-```
+```cmake
+cmake_minimum_required(VERSION 3.5)
+project(example)
+
 set(CMAKE_MODULE_PATH $ENV{CMAKEHELPERS_HOME}/cmake/Modules)
 include(init)
 include(firmware)
@@ -188,8 +202,8 @@ include(unit_testing)
 ```$ENV{CMAKEHELPERS_HOME}``` is set in the environment to point to cmake-helpers (this)
 project's root directory.
 
-Now, when required variables and functions are made available, cmake determines what build it needs
-to generate for the make tool to continue afterwards:
+Now, when the modules are processed, cmake determines what build it needs to generate based on
+```${BOARD_FAMILY}``` (initialized in [init.cmake](#init.cmake)):
 
 ```cmake
 function(add_target_config_args)
@@ -227,33 +241,35 @@ else ()
 endif ()
 ```
 
-When ```${BOARD_FAMILY}``` (passed by [make.sh](#make.sh)) matches one of the microcontroller
-branches, avr or stm32, cmake configures cross-compilation project and adds two more targets,
-build and flash. The functions are defined in [firmware.cmake](#firmware.cmake). Cmake then
-switches to a different toolchain and builds the firmware as specified by target's respective
-[avr/CMakeLists.txt](#avr_CMakeLists.txt) or [stm32/CMakeLists.txt](#stm32_CMakeLists.txt) file.
+Functions add_target_confg(), add_target_build(), add_target_flash() are defined in
+[firmware.cmake](#firmware.cmake). 
 
+If ```${BOARD_FAMILY}``` matches a microcontroller branch (avr or stm32), cmake switches the
+toolchain and generates a cross-compilation build based on the instructions in
+[avr/CMakeLists.txt](#avr_CMakeLists.txt) or [stm32/CMakeLists.txt](#stm32_CMakeLists.txt).
 
-If unit tests were enabled or ```${BOARD_FAMILY}``` is x86, cmake keeps using the current
-toolchain to build x86 sources located in ```${PROJECT_SOURCE_DIR}/src/x86``` and unit tests
-located in ```${PROJECT_SOURCE_DIR}/test```.
+If ```${BOARD_FAMILY}``` matches x86 or unit tests were enabled with -DENABLE_TESTS=ON, cmake
+continues to use the current x86 toolchain to generate the build based on
+[x86/CMakeLists.txt](#x86_CMakeLists.txt) and unit tests based on
+[test/CMakeLists.txt](#unit_CMakeLists.txt).
 
-#### <a name="avr_CMakeLists.txt" href="example/src/avr/CMakeLists.txt">example/src/avr/CMakeLists.txt</a>
+### <a name="avr_CMakeLists.txt" href="example/src/avr/CMakeLists.txt">example/src/avr/CMakeLists.txt</a>
 
-Since main [CMakeLists.txt](#CMakeLists.txt) switched cmake to a different toolchain to build AVR
-code, the global variables must be reinitialized except for those that were specifically passed to
-this toolchain (see add_target_config in [firmware.cmake](#firmware.cmake)). That is the reason
-for a regular preampble:
+In order to build firmware with a different toolchain, cmake "re-initializes" the build with that 
+new toolchain. Because of that, previously defined variables and functions must also be
+reinitialized except for those that were specifically passed in by the preceeding stage. The
+regular preamble should also be specified:
 
 ```cmake
 cmake_minimum_required(VERSION 3.5)
 project(${PROJECT_NAME})
 set(CMAKE_MODULE_PATH $ENV{CMAKEHELPERS_HOME}/cmake/Modules)
 include(init)
+#print_board_list()
 ```
 
-Note, ```${PROJECT_NAME}``` was passed in by prior cmake stage, but ```$ENV{CMAKEHELPERS_HOME}```
-is still read from the environment.
+Note, ```${PROJECT_NAME}``` was passed in, but ```$ENV{CMAKEHELPERS_HOME}``` is still read
+from the environment.
 
 Next, cmake executes usual instructions when setting up source files for compilation:
 ```cmake
@@ -264,51 +280,178 @@ add_compile_options(-Wall -Wextra)
 
 Here, cmake generates Arduino-specific instructions for building and flashing the firmware using
 a function defined in
-<a href="https://github.com/queezythegreat/arduino-cmake.git" target="_blank">arduino-cmake</a>
+<a href="https://github.com/queezythegreat/arduino-cmake.git" target="_blank">arduino-cmake</a>:
 ```cmake
 generate_arduino_firmware(...)
 ```
 
-#### <a name="stm32_CMakeLists.txt" href="example/src/stm32/CMakeLists.txt">example/src/stm32/CMakeLists.txt</a>
+### <a name="stm32_CMakeLists.txt" href="example/src/stm32/CMakeLists.txt">example/src/stm32/CMakeLists.txt</a>
 
+Most of what is described in [avr/CMakeLists.txt](#avr_CMakeLists.txt) applies here.
 
-#### <a name="x86_CMakeLists.txt" href="example/src/x86/CMakeLists.txt">example/src/x86/CMakeLists.txt</a>
+Additionally, stm32/CMakeLists.txt introduces the use of
+[project_setup.cmake](#project_setup.cmake), [freertos.cmake](#freertos.cmake), and
+[stm32f103c8t6.cmake](#stm32f103c8t6.cmake).
 
+The firmware for stm32f103c8 relies on
+<a href="https://github.com/libopencm3/libopencm3.git" target="_blank">libopencm3</a> library.
+Before the firmware can use it, the library must be built using make. One option is download the
+library and build it manually. Another is to use [project_setup.cmake](#project_setup.cmake)
+module which can automate the process a bit more.
 
-#### <a name="init.cmake" href="cmake/Modules/init.cmake">init.cmake</a>
+Another library that the firmware uses is
+<a href="https://www.freertos.org/" target="_blank">FreeRTOS</a>, which has its own usage
+requirements. See [freertos.cmake](#freertos.cmake) for details.
 
-Initializes common variables such as verbosity, build type, c++ standard, unit testing, etc.
+Cmake executes stm32-specific instructions defined in
+<a href="https://github.com/boltrobotics/stm32-cmake.git" target="_blank">stm32-cmake</a> toolchain:
+```cmake
+STM32_SET_TARGET_PROPERTIES(...)
+STM32_ADD_HEX_BIN_TARGETS(...)
+...
+```
 
-#### <a name="gtest.cmake" href="cmake/Modules/gtest.cmake">gtest.cmake</a>
+### <a name="x86_CMakeLists.txt" href="example/src/x86/CMakeLists.txt">example/src/x86/CMakeLists.txt</a>
 
-Adds gtest project as part of a current build
+The file instructs cmake to set up the sources, library and executable for build on x86 platform.
 
-#### <a name="project_setup.cmake" href="cmake/Modules/project_setup.cmake">project_setup.cmake</a>
+### <a name="unit_CMakeLists.txt" href="example/test/CMakeLists.txt">example/test/CMakeLists.txt</a>
 
-Sets up external projects
+The file instructs cmake on where to find and how to build unit tests. Here, it includes
+[gtest.cmake](#gtest.cmake) in order to locate, download, and build googletest framework
+along with the unit test sources.
 
-#### <a name="project_download.cmake.in" href="cmake/Modules/project_download.cmake.in">project_download.cmake.in</a>
+### <a name="init.cmake" href="cmake/Modules/init.cmake">init.cmake</a>
 
-Provides cmake template for importing external projects from a github repository
+The file checks and initializes common variables if undefined:
+* BOARD_FAMILY
+* CMAKE_BUILD_TYPE
+* EXECUTABLE_OUTPUT_PATH
+* LIBRARY_OUTPUT_PATH
+* CMAKE_CXX_STANDARD
+* CMAKE_RULE_MESSAGES
+* CMAKE_VERBOSE_MAKEFILE
 
-#### <a name="unit_testing.cmake" href="cmake/Modules/unit_testing.cmake">unit_testing.cmake</a>
+### <a name="unit_testing.cmake" href="cmake/Modules/unit_testing.cmake">unit_testing.cmake</a>
 
-Enables unit testing and adds subdirectory containing the tests
+The module checks if the platform is x86 and enables unit testing if ```${ENABLE_TESTS}``` option
+is set to ON. The option can be passed via [make.sh](#make.sh) (see [Example](#Example)).
 
-#### <a name="firmware.cmake" href="cmake/Modules/firmware.cmake">firmware.cmake</a>
+### <a name="gtest.cmake" href="cmake/Modules/gtest.cmake">gtest.cmake</a>
 
-When cross-compiling on a host x86 platform for a target AVR or STM32 platform, the module sets
-up a build environment (gcc, libs, etc.) suitable to build binaries for a given target.
+Per instructions in this file, cmake checks if googletest and its dependency (Boost) are already
+installed. If not, cmake uses [project_setup.cmake](#project_setup.cmake) to download the
+googletest sources from GitHub and add subdirectory with the content to the unit test build.
+If ```REQUIRED``` Boost libraries are not found, cmake will stop the build.
 
- portable code.
+```cmake
+set(GTEST_HOME $ENV{GTEST_HOME})
+find_package(Boost REQUIRED COMPONENTS system thread)
+find_package(GTest)
+...
+add_project(
+  PREFIX gtest
+  URL "https://github.com/google/googletest.git"
+  HOME "${GTEST_HOME}"
+  INC_DIR "${GTEST_HOME}/googletest/include")
+```
 
-#### <a name="freertos.cmake" href="cmake/Modules/freertos.cmake">freertos.cmake</a>
+### <a name="project_setup.cmake" href="cmake/Modules/project_setup.cmake">project_setup.cmake</a>
 
-Sets up FreeRTOS source/header files and directories, heap configuration
+The module is used to set up external cmake/make project for use by a current project. It involves:
+* downloading the files from external source such as GitHub
+* exporting of source, header and/or built library names and locations
+* adding targets, which are defined by the external project, to global scope. To see all targets
+after cmake completes, change into one of build-\* directories and type: ```make help```
 
-#### <a name="stm32f103c8t6.cmake" href="cmake/Modules/stm32f103c8t6.cmake">stm32f103c8t6.cmake</a>
+Note, project_setup uses <a href="https://cmake.org/cmake/help/latest/module/ExternalProject.html"
+target="_blank">ExternalProject</a> module. Many concepts can be clarified by reading that module's
+documentation.
 
-Configures variables for building stm32f103 firmware
+As an example, [stm32/CMakeLists.txt](#stm32_CMakeLists.txt) uses add_project() to set up
+libopencm3 external project:
+```cmake
+include(project_setup)
+
+set(LIBOPENCM3_HOME $ENV{LIBOPENCM3_HOME})
+
+string(TOLOWER ${STM32_FAMILY} STM32_FAMILY_LOWER)
+add_project(
+  PREFIX libopencm3
+  HOME "${LIBOPENCM3_HOME}"
+  URL "https://github.com/libopencm3/libopencm3.git"
+  BUILD_CMD "make TARGETS=stm32/${STM32_FAMILY_LOWER} VERBOSE=1"
+  BUILD_IN 1
+  FORCE_UPDATE 0
+  LIB_DIR "${LIBOPENCM3_HOME}/lib"
+  LIB_NAME opencm3_stm32${STM32_FAMILY_LOWER})
+
+include_directories(${libopencm3_INC_DIR})
+link_directories(${libopencm3_LIB_DIR})
+list(APPEND LIBRARIES ${libopencm3_LIB_NAME})
+```
+
+* PREFIX is prepended to the names of external project's artifacts. For example, in order to
+refer to libopencm3 include directory, cmake would use ```${libopencm3_INC_DIR}```
+* HOME is a directory of where to look for the project before trying to download it. If the
+directory doesn't exist or FORCE_UPDATE is set to 1, add_project()  will try to download the
+content into that location using download_project() function defined in the same module
+* URL is a project's external location
+* BUILD_CMD is a build command to execute
+* BUILD_IN is used to build projects in-source
+* LIB_DIR specifies of where the built library will be stored so as to export proper
+```${${PREFIX}_LIB_DIR}``` location
+* LIB_NAME is required if the project's library name is non-standard. Usually a library is named
+after project's name, i.e. ```${PREFIX}``` (excluding lib prefix and extension). In case of
+libopencm3, the name for stm32f103c8t6 board is ```libopencm3_stm32f1.a```
+
+### <a name="project_download.cmake.in" href="cmake/Modules/project_download.cmake.in">project_download.cmake.in</a>
+
+When setting up new external project using [project_setup.cmake](#project_setup.cmake), this Cmake
+template is used to generate instructions for downloading and building that project:
+
+```cmake
+include(ExternalProject)
+ExternalProject_Add(${PREFIX}
+  GIT_REPOSITORY    ${URL}
+  GIT_TAG           master
+  ${SOURCE_DIR}
+  ${BINARY_DIR}
+  ${CONFIG_CMD}
+  ${BUILD_CMD}
+  ${BUILD_IN}
+  ${INSTALL_CMD}
+  ${TEST_CMD}
+  ${LOG_BUILD}
+)
+```
+### <a name="firmware.cmake" href="cmake/Modules/firmware.cmake">firmware.cmake</a>
+
+The module defines three functions:
+* add_target_config() configures a new cmake environment to be executed with a different toolchain
+* add_target_build() adds a custom target to start cross-compilation by using ```make build```
+* add_target_flash() adds a custom target to upload the built firmware to the target board; to be
+invoked with ```make flash```
+
+### <a name="freertos.cmake" href="cmake/Modules/freertos.cmake">freertos.cmake</a>
+
+The module helps to set up <a href="https://www.freertos.org/" target="_blank">FreeRTOS</a>
+source/header file locations to be included as part of the build for stm32f103c8t6 board.
+
+See <a href="https://www.freertos.org/Documentation/RTOS_book.html" target="_blank">FreeRTOS
+documentation</a> for details about this interesting OS.
+
+### <a name="stm32f103c8t6.cmake" href="cmake/Modules/stm32f103c8t6.cmake">stm32f103c8t6.cmake</a>
+
+The module aggregates compiler and linker flags which are required to build firmware for
+stm32f103c8t6.
+
+To some degree, this module defeats the purpose of using
+<a href="https://github.com/boltrobotics/stm32-cmake.git" target="_blank">stm32-cmake</a>.
+Moreover, most features of stm32-cmake remain unused and may cause difficulty during the build.
+A few functions that [stm32/CMakeLists.txt](#stm32_CMakeLists.txt) refers to do not justify
+keeping that dependency around. ```TODO``` reassess the benefit of using stm32-cmake given the
+circumstances.
 
 # <a name="Contribute"></a>Contribute
 
