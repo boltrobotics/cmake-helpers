@@ -454,7 +454,7 @@ A few functions that [stm32/CMakeLists.txt](#stm32_CMakeLists.txt) refers to do 
 keeping that dependency around. ```TODO``` reassess the benefit of using stm32-cmake given the
 circumstances.
 
-# <a name="Contribute"></a>Contribute
+# <a name="Contribute" href="https://boltrobotics.com/contribute/" target="_blank">Contribute</a>
 
 Consider supporting our projects by contributing to their development.
 <a href="https://boltrobotics.com/contribute/" target="_blank">Learn more at boltrobotics.com</a>
