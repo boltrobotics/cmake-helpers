@@ -120,8 +120,9 @@ example/
 
 To upload just-built firmware to a connected board, change into ```build-avr``` or
 ```build-stm32``` and execute:
-```
-make flash
+
+```bash
+make example-flash
 ```
 
 To run an example unit test which is defined in ```test/example_test.cpp```, change into
@@ -430,9 +431,10 @@ ExternalProject_Add(${PREFIX}
 
 The module defines three functions:
 * add_target_config() configures a new cmake environment to be executed with a different toolchain
-* add_target_build() adds a custom target to start cross-compilation by using ```make build```
+* add_target_build() adds a custom target to start cross-compilation by using
+```make _project_name_```
 * add_target_flash() adds a custom target to upload the built firmware to the target board; to be
-invoked with ```make flash```
+invoked with ```make _project_name_-flash```
 
 ### <a name="freertos.cmake" href="cmake/Modules/freertos.cmake">freertos.cmake</a>
 
