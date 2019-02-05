@@ -17,6 +17,7 @@ include(unit_testing)
 
 function(add_target_config_args)
   add_target_config(
+    ${PROJECT_NAME}
     SRC_DIR ${PROJECT_SOURCE_DIR}/src/${BOARD_FAMILY}
     BIN_DIR ${PROJECT_BINARY_DIR}/src/${BOARD_FAMILY}
     TOOLCHAIN_FILE ${TOOLCHAIN_FILE}

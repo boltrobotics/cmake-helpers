@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.5)
 
 # Configure CMake project to build firmware.
 #
-function(add_target_config)
+function(add_target_config BIN_NAME)
   cmake_parse_arguments(p "" "SRC_DIR;BIN_DIR;TOOLCHAIN_FILE" "CMAKE_ARGUMENTS" ${ARGN})
 
   if (NOT p_SRC_DIR)
@@ -26,7 +26,7 @@ function(add_target_config)
   file(MAKE_DIRECTORY ${p_BIN_DIR})
 
   add_custom_target(
-    config
+    ${BIN_NAME}-config
     WORKING_DIRECTORY ${p_BIN_DIR}
     COMMAND ${CMAKE_COMMAND} ${DTOOLCHAIN_FILE} ${p_CMAKE_ARGUMENTS} ${p_SRC_DIR}
   )
@@ -39,11 +39,11 @@ endfunction()
 
 function(add_target_build BIN_DIR BIN_NAME)
   add_custom_target(
-    build ALL
+    ${BIN_NAME} ALL
     WORKING_DIRECTORY ${BIN_DIR}
     COMMAND ${CMAKE_COMMAND} --build ${BIN_DIR} -- ${BIN_NAME}
   )
-  add_dependencies(build config)
+  add_dependencies(${BIN_NAME} ${BIN_NAME}-config)
 endfunction()
 
 # } build
@@ -57,11 +57,11 @@ function(add_target_flash BIN_DIR BIN_NAME OUT_DIR BOARD_FAMILY)
   if (_cmp)
 
     add_custom_target(
-      flash
+      ${BIN_NAME}-flash
       WORKING_DIRECTORY ${BIN_DIR}
       COMMAND ${CMAKE_COMMAND} --build ${BIN_DIR} -- ${BIN_NAME}-upload
     )
-    add_dependencies(flash build)
+    add_dependencies(${BIN_NAME}-flash ${BIN_NAME})
 
   else ()
 
@@ -79,11 +79,11 @@ function(add_target_flash BIN_DIR BIN_NAME OUT_DIR BOARD_FAMILY)
       endif ()
 
       add_custom_target(
-        flash
+        ${BIN_NAME}-flash
         WORKING_DIRECTORY ${OUT_DIR}/bin
         COMMAND ${STFLASH} ${FLASH_SIZE_PARAM} write ${BIN_NAME}.bin ${p_ADDR}
       )
-      add_dependencies(flash build)
+      add_dependencies(${BIN_NAME}-flash ${BIN_NAME})
 
     endif ()
   endif ()
