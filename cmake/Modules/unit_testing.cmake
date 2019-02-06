@@ -9,5 +9,5 @@ if (_cmp)
   endif()
 
 else ()
-  message(STATUS "${PROJECT_NAME} doesn't support unit testing on ${BOARD_FAMILY}")
+  message(STATUS "Project ${PROJECT_NAME} doesn't support unit testing on ${BOARD_FAMILY}")
 endif()

@@ -13,7 +13,7 @@ include(unit_testing)
 # } unit testing, x86
 
 ####################################################################################################
-# x86, stm32 {
+# stm32, avr, x86 {
 
 function(add_target_config_args)
   add_target_config(
@@ -22,11 +22,12 @@ function(add_target_config_args)
     BIN_DIR ${PROJECT_BINARY_DIR}/src/${BOARD_FAMILY}
     TOOLCHAIN_FILE ${TOOLCHAIN_FILE}
     CMAKE_ARGUMENTS
-      -DPROJECT_NAME=${PROJECT_NAME}
+      -DSUBPROJECT_NAME=${PROJECT_NAME}
+      -D${PROJECT_NAME_UPPER}_SOURCE_DIR=${PROJECT_SOURCE_DIR}
       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-      -DMAIN_SOURCE_DIR=${PROJECT_SOURCE_DIR}
       -DBOARD_FAMILY=${BOARD_FAMILY}
       -DOUTPUT_PATH=${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}
+      -DBUILD_EXE=${BUILD_EXE}
       ${ARGN}
   )
 endfunction()
@@ -74,3 +75,5 @@ else ()
 
   endif ()
 endif ()
+
+# } stm32, avr, x86
