@@ -54,6 +54,7 @@ Arm GNU Embedded Toolchain, FreeRTOS).
   * [gtest.cmake](#gtest.cmake)
   * [project_setup.cmake](#project_setup.cmake)
   * [project_download.cmake.in](#project_download.cmake.in)
+  * [arduino_subproject.cmake](#arduino_subproject.cmake)
   * [firmware.cmake](#firmware.cmake)
   * [freertos.cmake](#freertos.cmake)
   * [stm32f103c8t6.cmake](#stm32f103c8t6.cmake)
@@ -259,32 +260,16 @@ continues to use the current x86 toolchain to generate the build based on
 
 In order to build firmware with a different toolchain, cmake "re-initializes" the build with that 
 new toolchain. Because of that, previously defined variables and functions must also be
-reinitialized except for those that were specifically passed in by the preceeding stage. The
-regular preamble should also be specified:
+reinitialized except for those that were specifically passed in by the preceeding stage.
+These common tasks and more reside in [arduino_subproject.cmake](#arduino_subproject.cmake)
+
+Given that the default behaviour is acceptable, in the example CMakeLists.txt file all what is
+needed is this:
 
 ```cmake
 cmake_minimum_required(VERSION 3.5)
-project(${PROJECT_NAME})
 set(CMAKE_MODULE_PATH $ENV{CMAKEHELPERS_HOME}/cmake/Modules)
-include(init)
-#print_board_list()
-```
-
-Note, ```${PROJECT_NAME}``` was passed in, but ```$ENV{CMAKEHELPERS_HOME}``` is read
-from the environment.
-
-Next, cmake executes usual instructions when setting up source files for compilation:
-```cmake
-include_directories(...)
-add_definitions(-D${BOARD_FAMILY})
-add_compile_options(-Wall -Wextra)
-```
-
-Here, cmake generates Arduino-specific instructions for building and flashing the firmware using
-a function defined in
-<a href="https://github.com/queezythegreat/arduino-cmake.git" target="_blank">arduino-cmake</a>:
-```cmake
-generate_arduino_firmware(...)
+include(arduino_subproject)
 ```
 
 ### <a name="stm32_CMakeLists.txt" href="example/src/stm32/CMakeLists.txt">example/src/stm32/CMakeLists.txt</a>
@@ -427,6 +412,44 @@ ExternalProject_Add(${PREFIX}
   ${LOG_BUILD}
 )
 ```
+
+### <a name="arduino_subproject.cmake" href="cmake/Modules/arduino_subproject.cmake">
+arduino_subproject.cmake</a>
+
+The module determines a project name first. Cmake can generate build for a library or an
+executable. Library name will likely be different from an executable. The executable can
+specify which name the library should use by setting ```${SUBPROJECT_NAME}. Otherwise, the
+default is to use global ```${PROJECT_NAME}```
+```cmake
+if (NOT SUBPROJECT_NAME)
+  message(STATUS "Setting default SUBPROJECT_NAME to ${PROJECT_NAME}")
+  project(${PROJECT_NAME})
+else ()
+  project(${SUBPROJECT_NAME})
+endif ()
+
+include(init)
+```
+
+Next, cmake executes usual instructions when setting up source files for compilation:
+```cmake
+include_directories(...)
+file(GLOB_RECURSE SOURCES ...)
+add_definitions(-D${BOARD_FAMILY})
+...
+```
+
+Here, cmake generates Arduino-specific instructions for building and flashing the firmware using
+a function defined in
+<a href="https://github.com/queezythegreat/arduino-cmake.git" target="_blank">arduino-cmake</a>:
+```cmake
+if (BUILD_EXE)
+  generate_arduino_library(...)
+else ()
+  generate_arduino_firmware(...)
+...
+```
+
 ### <a name="firmware.cmake" href="cmake/Modules/firmware.cmake">firmware.cmake</a>
 
 The module defines three functions:
