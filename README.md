@@ -54,7 +54,7 @@ Arm GNU Embedded Toolchain, FreeRTOS).
   * [gtest.cmake](#gtest.cmake)
   * [project_setup.cmake](#project_setup.cmake)
   * [project_download.cmake.in](#project_download.cmake.in)
-  * [arduino_subproject.cmake](#arduino_subproject.cmake)
+  * [avr_project.cmake](#avr_project.cmake)
   * [firmware.cmake](#firmware.cmake)
   * [freertos.cmake](#freertos.cmake)
   * [stm32f103c8t6.cmake](#stm32f103c8t6.cmake)
@@ -261,7 +261,7 @@ continues to use the current x86 toolchain to generate the build based on
 In order to build firmware with a different toolchain, cmake "re-initializes" the build with that 
 new toolchain. Because of that, previously defined variables and functions must also be
 reinitialized except for those that were specifically passed in by the preceeding stage.
-These common tasks and more reside in [arduino_subproject.cmake](#arduino_subproject.cmake)
+These common tasks and more reside in [avr_project.cmake](#avr_project.cmake)
 
 Given that the default behaviour is acceptable, in the example CMakeLists.txt file all what is
 needed is this:
@@ -269,7 +269,7 @@ needed is this:
 ```cmake
 cmake_minimum_required(VERSION 3.5)
 set(CMAKE_MODULE_PATH $ENV{CMAKEHELPERS_HOME}/cmake/Modules)
-include(arduino_subproject)
+include(avr_project)
 ```
 
 ### <a name="stm32_CMakeLists.txt" href="example/src/stm32/CMakeLists.txt">example/src/stm32/CMakeLists.txt</a>
@@ -413,8 +413,8 @@ ExternalProject_Add(${PREFIX}
 )
 ```
 
-### <a name="arduino_subproject.cmake" href="cmake/Modules/arduino_subproject.cmake">
-arduino_subproject.cmake</a>
+### <a name="avr_project.cmake" href="cmake/Modules/avr_project.cmake">
+avr_project.cmake</a>
 
 The module determines a project name first. Cmake can generate build for a library or an
 executable. Library name will likely be different from an executable. The executable can

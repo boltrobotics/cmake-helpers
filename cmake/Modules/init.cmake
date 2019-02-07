@@ -31,8 +31,11 @@ function(print_variables)
   endforeach()
 endfunction()
 
-string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
-set(ROOT_SOURCE_DIR ${${PROJECT_NAME_UPPER}_SOURCE_DIR})
+if (NOT ROOT_SOURCE_DIR)
+  set(ROOT_SOURCE_DIR ${PROJECT_SOURCE_DIR})
+endif ()
+
+message(STATUS "ROOT_SOURCE_DIR: ${ROOT_SOURCE_DIR}")
 
 ####################################################################################################
 # Cross-compilation {
@@ -44,9 +47,10 @@ if (NOT BOARD_FAMILY)
   set(BOARD_FAMILY "x86")
 endif()
 
-# Related to Arduino Leonardo
-option(ENABLE_USB_CON "Enable USB_CON for board Leonardo" OFF)
-option(PRINT_BOARDS "Print supported Arduino boards" OFF)
-option(BUILD_EXE "Build ${PROJECT_NAME} executable" OFF)
+if (NOT LIB_TYPE)
+  set(LIB_TYPE SHARED)
+endif ()
+
+set(MAIN_SRC ${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}/main.cpp)
 
 # } Cross-compilation
