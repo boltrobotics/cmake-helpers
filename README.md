@@ -45,17 +45,22 @@ Arm GNU Embedded Toolchain, FreeRTOS).
 * [Details](#Details)
   * [example/make.sh](#make.sh)
   * [example/CMakeLists.txt](#CMakeLists.txt)
+  * [main_project.cmake](#main_project.cmake)
   * [example/src/avr/CMakeLists.txt](#avr_CMakeLists.txt)
+  * [avr_project.cmake](#avr_project.cmake)
   * [example/src/stm32/CMakeLists.txt](#stm32_CMakeLists.txt)
+  * [stm32_project.cmake](#stm32_project.cmake)
   * [example/src/x86/CMakeLists.txt](#x86_CMakeLists.txt)
+  * [x86_project.cmake](#x86_project.cmake)
   * [example/test/CMakeLists.txt](#unit_CMakeLists.txt)
+  * [test_project.cmake](#test_project.cmake)
+  * [gtest.cmake](#gtest.cmake)
   * [init.cmake](#init.cmake)
   * [unit_testing.cmake](#unit_testing.cmake)
-  * [gtest.cmake](#gtest.cmake)
   * [project_setup.cmake](#project_setup.cmake)
   * [project_download.cmake.in](#project_download.cmake.in)
-  * [avr_project.cmake](#avr_project.cmake)
   * [firmware.cmake](#firmware.cmake)
+  * [libopencm3.cmake](#libopencm3.cmake)
   * [freertos.cmake](#freertos.cmake)
   * [stm32f103c8t6.cmake](#stm32f103c8t6.cmake)
 * [Contribute](#Contribute)
@@ -184,9 +189,18 @@ Alternatively, module [project_setup.cmake](#project_setup.cmake) can achieve si
 goal but as part of the building process
 
 ### <a name="CMakeLists.txt" href="example/CMakeLists.txt">example/CMakeLists.txt</a>
+Cmake processes this file first. It sits at the project's root and sets a couple of general 
+parameters and then loads the common code for statring cross-compiled project from
+[main_project.cmake](#main_project.cmake):
 
-Cmake processes this file first. It contains three decision branches for generating avr, stm32
-or x86 builds.
+```cmake
+project(example)
+set(CMAKE_MODULE_PATH $ENV{CMAKEHELPERS_HOME}/cmake/Modules)
+set(ROOT_SOURCE_DIR ${PROJECT_SOURCE_DIR})
+include(main_project)
+```
+
+### <a name="main_project.cmake" href="main_project.cmake">main_project.cmake</a>
 
 Instructions in the file start with a regular version/project preamble. Next, the file sets
 the path to modules and instructs to include [init.cmake](#init.cmake),
@@ -244,6 +258,8 @@ else ()
 endif ()
 ```
 
+Cmake follows one of three decision branches for generating avr, stm32 or x86 build.
+
 Functions add_target_confg(), add_target_build(), add_target_flash() are defined in
 [firmware.cmake](#firmware.cmake). 
 
@@ -263,36 +279,92 @@ new toolchain. Because of that, previously defined variables and functions must 
 reinitialized except for those that were specifically passed in by the preceeding stage.
 These common tasks and more reside in [avr_project.cmake](#avr_project.cmake)
 
-Given that the default behaviour is acceptable, in the example CMakeLists.txt file all what is
-needed is this:
+Example CMakeLists.txt instructs to build an executable with ```set(BUILD_EXE ON)```:
 
 ```cmake
 cmake_minimum_required(VERSION 3.5)
 set(CMAKE_MODULE_PATH $ENV{CMAKEHELPERS_HOME}/cmake/Modules)
+
+if (NOT BUILD_LIB AND NOT BUILD_EXE)
+  set(BUILD_LIB OFF)
+  set(BUILD_EXE ON)
+endif ()
+
 include(avr_project)
+```
+
+### <a name="avr_project.cmake" href="cmake/Modules/avr_project.cmake">avr_project.cmake</a>
+
+First, the module sets a project name: 
+
+```cmake
+if (SUBPROJECT_NAME)
+  project(${SUBPROJECT_NAME})
+else ()
+  project(${PROJECT_NAME})
+endif ()
+
+include(init)
+```
+
+Next, cmake executes usual instructions when setting up source files for compilation:
+
+```cmake
+include_directories(...)
+file(GLOB_RECURSE SOURCES ...)
+add_definitions(-D${BOARD_FAMILY})
+...
+```
+
+Here, cmake generates Arduino-specific instructions for building and flashing the firmware using
+functions defined in
+<a href="https://github.com/queezythegreat/arduino-cmake.git" target="_blank">arduino-cmake</a>:
+```cmake
+if (BUILD_LIB)
+  generate_arduino_library(...)
+...
+if (BUILD_EXE)
+  generate_arduino_firmware(...)
+...
 ```
 
 ### <a name="stm32_CMakeLists.txt" href="example/src/stm32/CMakeLists.txt">example/src/stm32/CMakeLists.txt</a>
 
-Most of what is described in [avr/CMakeLists.txt](#avr_CMakeLists.txt) applies here.
-
-Additionally, stm32/CMakeLists.txt introduces the use of
-[project_setup.cmake](#project_setup.cmake), [freertos.cmake](#freertos.cmake), and
-[stm32f103c8t6.cmake](#stm32f103c8t6.cmake).
+This project file uses the same idea as described in [avr/CMakeLists.txt](#avr_CMakeLists.txt), but
+here more instructions need to be specified.
 
 The firmware for stm32f103c8 depends on
 <a href="https://github.com/libopencm3/libopencm3.git" target="_blank">libopencm3</a> library.
-Before the firmware can use it, libopencm3 must be built using ```make```. One option to achieve it is to
-download and build the library manually. Another is to use [project_setup.cmake](#project_setup.cmake)
-module which can automate the process a bit more.
+Before the firmware can use it, libopencm3 must be built using ```make```. One option to achieve it
+is to download and build the library manually. Another is to use
+[project_setup.cmake](#project_setup.cmake) module which can automate the process a bit more.
 
 Another library that the firmware depends on is
 <a href="https://www.freertos.org/" target="_blank">FreeRTOS</a>, which has its own usage
 requirements. See [freertos.cmake](#freertos.cmake) for details.
 
+```
+set(BUILD_LIB OFF)
+set(BUILD_EXE ON)
+...
+include(stm32f103c8t6)
+include(libopencm3)
+include(freertos)
+...
+include(stm32_project)
+```
+
+### <a name="stm32_project.cmake" href="cmake/Modules/stm32_project.txt">stm32_project.cmake</a>
+
+Most of what is described in [avr_project.cmake](#avr_project.cmake) applies here, but instead
 Cmake executes stm32-specific instructions defined in
 <a href="https://github.com/boltrobotics/stm32-cmake.git" target="_blank">stm32-cmake</a> toolchain:
+
 ```cmake
+if (BUILD_EXE)
+  set(TARGET ${PROJECT_NAME}${EXE_SUFFIX})
+  add_executable(${TARGET} ${MAIN_SRC} ${SOURCES})
+...
 STM32_SET_TARGET_PROPERTIES(...)
 STM32_ADD_HEX_BIN_TARGETS(...)
 ...
@@ -300,29 +372,50 @@ STM32_ADD_HEX_BIN_TARGETS(...)
 
 ### <a name="x86_CMakeLists.txt" href="example/src/x86/CMakeLists.txt">example/src/x86/CMakeLists.txt</a>
 
-The file instructs cmake to set up the sources, library and executable for build on x86 platform.
+The file instructs to build a library, an executable, and link the executable with the library:
+
+```
+set(BUILD_LIB ON)
+set(BUILD_EXE ON)
+set(EXE_SUFFIX "-exe")
+
+set(LIB_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
+set(EXE_LIBRARIES ${PROJECT_NAME})
+
+include(x86_project)
+```
+
+```EXE_SUFFIX``` is required because x86_project tries to use ```${PROJECT_NAME}``` for both library
+and executable targets.
+
+### <a name="x86_project.cmake" href="cmake/Modules/x86_project.txt">x86_project.cmake</a>
+
+The module is similar in structure and purpose to [avr_project.cmake](#avr_project.cmake) and
+[stm32_project.cmake](#stm32_project.cmake), but the build target is x86 platform.
 
 ### <a name="unit_CMakeLists.txt" href="example/test/CMakeLists.txt">example/test/CMakeLists.txt</a>
 
-The file instructs cmake on where to find and how to build unit tests. Cmake instructions include
-[gtest.cmake](#gtest.cmake) in order to locate, download, and build googletest framework
-along with the unit test sources.
+The file specifies what to link unit testing executable with and loads
+[test_project.cmake](#test_project.cmake):
+```
+set(EXE_LIBRARIES ${PROJECT_NAME})
+set(EXE_SUFFIX "-tests")
+include(test_project)
+```
 
-### <a name="init.cmake" href="cmake/Modules/init.cmake">init.cmake</a>
+### <a name="test_project.cmake" href="cmake/Modules/test_project.txt">test_project.cmake</a>
 
-The file checks and initializes common variables if undefined:
-* BOARD_FAMILY
-* CMAKE_BUILD_TYPE
-* EXECUTABLE_OUTPUT_PATH
-* LIBRARY_OUTPUT_PATH
-* CMAKE_CXX_STANDARD
-* CMAKE_RULE_MESSAGES
-* CMAKE_VERBOSE_MAKEFILE
+Instructions ini this file are similar to [x86_project.cmake](#x86_project.cmake), except only
+an executable is needed which should be linked with google test and Boost libraries:
 
-### <a name="unit_testing.cmake" href="cmake/Modules/unit_testing.cmake">unit_testing.cmake</a>
-
-The module checks if the platform is x86 and enables unit testing if ```${ENABLE_TESTS}``` option
-is set to ON. The option can be passed via [make.sh](#make.sh) (see [Example](#Example)).
+```
+include(gtest)
+...
+add_executable(${PROJECT_NAME}${EXE_SUFFIX} ${SOURCES})
+...
+target_link_libraries(${PROJECT_NAME}${EXE_SUFFIX}
+  ${EXE_LIBRARIES} ${gtest_LIB_NAME} ${Boost_LIBRARIES})
+```
 
 ### <a name="gtest.cmake" href="cmake/Modules/gtest.cmake">gtest.cmake</a>
 
@@ -341,7 +434,25 @@ add_project(
   URL "https://github.com/google/googletest.git"
   HOME "${GTEST_HOME}"
   INC_DIR "${GTEST_HOME}/googletest/include")
+...
 ```
+
+### <a name="init.cmake" href="cmake/Modules/init.cmake">init.cmake</a>
+
+The file checks and initializes common variables if undefined:
+* BOARD_FAMILY
+* CMAKE_BUILD_TYPE
+* EXECUTABLE_OUTPUT_PATH
+* LIBRARY_OUTPUT_PATH
+* CMAKE_CXX_STANDARD
+* CMAKE_RULE_MESSAGES
+* CMAKE_VERBOSE_MAKEFILE
+* LIB_TYPE
+
+### <a name="unit_testing.cmake" href="cmake/Modules/unit_testing.cmake">unit_testing.cmake</a>
+
+The module checks if the platform is x86 and enables unit testing if ```${ENABLE_TESTS}``` option
+is set to ON. The option can be passed via [make.sh](#make.sh) (see [Example](#Example)).
 
 ### <a name="project_setup.cmake" href="cmake/Modules/project_setup.cmake">project_setup.cmake</a>
 
@@ -355,8 +466,8 @@ Note, project_setup uses <a href="https://cmake.org/cmake/help/latest/module/Ext
 target="_blank">ExternalProject</a> module. Many concepts can be clarified by reading that module's
 documentation.
 
-As an example, [stm32/CMakeLists.txt](#stm32_CMakeLists.txt) uses add_project() to set up
-libopencm3 external project:
+As an example, [libopencm3.cmake](#libopencm3.cmake) uses add_project() to set up external project:
+
 ```cmake
 include(project_setup)
 
@@ -413,43 +524,6 @@ ExternalProject_Add(${PREFIX}
 )
 ```
 
-### <a name="avr_project.cmake" href="cmake/Modules/avr_project.cmake">
-avr_project.cmake</a>
-
-The module determines a project name first. Cmake can generate build for a library or an
-executable. Library name will likely be different from an executable. The executable can
-specify which name the library should use by setting ```${SUBPROJECT_NAME}. Otherwise, the
-default is to use global ```${PROJECT_NAME}```
-```cmake
-if (NOT SUBPROJECT_NAME)
-  message(STATUS "Setting default SUBPROJECT_NAME to ${PROJECT_NAME}")
-  project(${PROJECT_NAME})
-else ()
-  project(${SUBPROJECT_NAME})
-endif ()
-
-include(init)
-```
-
-Next, cmake executes usual instructions when setting up source files for compilation:
-```cmake
-include_directories(...)
-file(GLOB_RECURSE SOURCES ...)
-add_definitions(-D${BOARD_FAMILY})
-...
-```
-
-Here, cmake generates Arduino-specific instructions for building and flashing the firmware using
-a function defined in
-<a href="https://github.com/queezythegreat/arduino-cmake.git" target="_blank">arduino-cmake</a>:
-```cmake
-if (BUILD_EXE)
-  generate_arduino_library(...)
-else ()
-  generate_arduino_firmware(...)
-...
-```
-
 ### <a name="firmware.cmake" href="cmake/Modules/firmware.cmake">firmware.cmake</a>
 
 The module defines three functions:
@@ -458,6 +532,10 @@ The module defines three functions:
 ```make _project_name_```
 * add_target_flash() adds a custom target to upload the built firmware to the target board; to be
 invoked with ```make _project_name_-flash```
+
+### <a name="libopencm3.cmake" href="cmake/Modules/libopencm3.cmake">libopencm3.cmake</a>
+
+The file uses [project_setup.cmake](#project_setup.cmake) to set up external project dependency.
 
 ### <a name="freertos.cmake" href="cmake/Modules/freertos.cmake">freertos.cmake</a>
 

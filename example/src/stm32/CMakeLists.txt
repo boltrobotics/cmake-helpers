@@ -3,8 +3,6 @@ set(CMAKE_MODULE_PATH $ENV{CMAKEHELPERS_HOME}/cmake/Modules)
 
 set(BUILD_LIB OFF)
 set(BUILD_EXE ON)
-# This will not work as firmware.cmake defines the target as ${PROJECT_NAME} without EXE_SUFFIX
-#set(EXE_SUFFIX ".elf")
 
 include(stm32f103c8t6)
 
