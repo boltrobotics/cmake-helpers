@@ -4,12 +4,12 @@ The repository contains Cmake modules and example files which help to save time 
 setting up new C/C++ projects. The main goal is to reuse working solutions to common
 problems such as:
 
-* Combining of cross-compilation for AVR / STM32F103 with unit testing on x86 platform
+* Combining of cross-compilation for AVR / STM32 with unit testing on x86 platform
 * Downloading and refreshing of dependencies
 * Setting up paths to headers, sources and libraries
 * Re-typing boilerplate code around initialization and checks
 * Cluttering build files with large, duplicated blocks of instructions
-* Recurrent research and refresh of information about Cmake
+* Recurrent research on Cmake workings
 
 ### Platforms and requirements
 
@@ -279,18 +279,15 @@ new toolchain. Because of that, previously defined variables and functions must 
 reinitialized except for those that were specifically passed in by the preceeding stage.
 These common tasks and more reside in [avr_project.cmake](#avr_project.cmake)
 
-Example CMakeLists.txt instructs to build an executable with ```set(BUILD_EXE ON)```:
+Example CMakeLists.txt instructs to build an executable with ```build_exe(...)```:
 
 ```cmake
 cmake_minimum_required(VERSION 3.5)
 set(CMAKE_MODULE_PATH $ENV{CMAKEHELPERS_HOME}/cmake/Modules)
 
-if (NOT BUILD_LIB AND NOT BUILD_EXE)
-  set(BUILD_LIB OFF)
-  set(BUILD_EXE ON)
-endif ()
-
 include(avr_project)
+find_srcs()
+build_exe(SRCS ${SOURCES})
 ```
 
 ### <a name="avr_project.cmake" href="cmake/Modules/avr_project.cmake">avr_project.cmake</a>
@@ -320,11 +317,11 @@ Here, cmake generates Arduino-specific instructions for building and flashing th
 functions defined in
 <a href="https://github.com/queezythegreat/arduino-cmake.git" target="_blank">arduino-cmake</a>:
 ```cmake
-if (BUILD_LIB)
-  generate_arduino_library(...)
+function (build_lib)
+  cmake_parse_arguments(p "" "SUFFIX" "SRCS;LIBS" ${ARGN})
 ...
-if (BUILD_EXE)
-  generate_arduino_firmware(...)
+function (build_exe)
+  cmake_parse_arguments(p "" "SUFFIX" "SRCS;LIBS" ${ARGN})
 ...
 ```
 
@@ -337,21 +334,24 @@ The firmware for stm32f103c8 depends on
 <a href="https://github.com/libopencm3/libopencm3.git" target="_blank">libopencm3</a> library.
 Before the firmware can use it, libopencm3 must be built using ```make```. One option to achieve it
 is to download and build the library manually. Another is to use
-[project_setup.cmake](#project_setup.cmake) module which can automate the process a bit more.
+[project_setup.cmake](#project_setup.cmake) module which can automate the process a bit more. These
+instructions are specified in [libopencm3.cmake](#libopencm3).
 
 Another library that the firmware depends on is
 <a href="https://www.freertos.org/" target="_blank">FreeRTOS</a>, which has its own usage
 requirements. See [freertos.cmake](#freertos.cmake) for details.
 
 ```
-set(BUILD_LIB OFF)
-set(BUILD_EXE ON)
-...
 include(stm32f103c8t6)
+include(stm32_project)
+
+find_srcs()
+
 include(libopencm3)
+...
 include(freertos)
 ...
-include(stm32_project)
+build_exe(SRCS ${SOURCES} LIBS ${LIBS})
 ```
 
 ### <a name="stm32_project.cmake" href="cmake/Modules/stm32_project.txt">stm32_project.cmake</a>
@@ -361,12 +361,18 @@ Cmake executes stm32-specific instructions defined in
 <a href="https://github.com/boltrobotics/stm32-cmake.git" target="_blank">stm32-cmake</a> toolchain:
 
 ```cmake
-if (BUILD_EXE)
-  set(TARGET ${PROJECT_NAME}${EXE_SUFFIX})
-  add_executable(${TARGET} ${MAIN_SRC} ${SOURCES})
+function (setup)
+  include_directories(
 ...
-STM32_SET_TARGET_PROPERTIES(...)
-STM32_ADD_HEX_BIN_TARGETS(...)
+function (build_lib)
+  cmake_parse_arguments(p "" "SUFFIX" "OBJS;SRCS;LIBS" ${ARGN})
+  set(TARGET ${PROJECT_NAME}${p_SUFFIX})
+...
+function (build_exe)
+  cmake_parse_arguments(p "" "SUFFIX" "OBJS;SRCS;LIBS" ${ARGN})
+
+  STM32_SET_TARGET_PROPERTIES(...)
+  STM32_ADD_HEX_BIN_TARGETS(...)
 ...
 ```
 
@@ -375,46 +381,48 @@ STM32_ADD_HEX_BIN_TARGETS(...)
 The file instructs to build a library, an executable, and link the executable with the library:
 
 ```
-set(BUILD_LIB ON)
-set(BUILD_EXE ON)
-set(EXE_SUFFIX "-exe")
-
-set(LIB_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
-set(EXE_LIBRARIES ${PROJECT_NAME})
-
 include(x86_project)
+
+set(CMAKE_MACOSX_RPATH 1)
+find_package(Threads)
+
+find_srcs(FILTER ${MAIN_SRC})
+build_lib(SRCS "${SOURCES}" LIBS ${CMAKE_THREAD_LIBS_INIT} LIB_TYPE SHARED)
+build_exe(OBJS "${SOURCES_OBJ}" SRCS "${MAIN_SRC}" LIBS ${PROJECT_NAME} SUFFIX "-exe")
 ```
 
-```EXE_SUFFIX``` is required because x86_project tries to use ```${PROJECT_NAME}``` for both library
-and executable targets.
+```SUFFIX``` for executable is required because x86_project uses ```${PROJECT_NAME}``` for the
+library. Thus, executable target is named suing ```${PROJECT_NAME}${SUFFIX}``` combination, e.g.:
+```example-exe```
 
 ### <a name="x86_project.cmake" href="cmake/Modules/x86_project.txt">x86_project.cmake</a>
 
 The module is similar in structure and purpose to [avr_project.cmake](#avr_project.cmake) and
-[stm32_project.cmake](#stm32_project.cmake), but the build target is x86 platform.
+[stm32_project.cmake](#stm32_project.cmake), but target platform is x86.
 
 ### <a name="unit_CMakeLists.txt" href="example/test/CMakeLists.txt">example/test/CMakeLists.txt</a>
 
 The file specifies what to link unit testing executable with and loads
 [test_project.cmake](#test_project.cmake):
 ```
-set(EXE_LIBRARIES ${PROJECT_NAME})
-set(EXE_SUFFIX "-tests")
 include(test_project)
+find_test_srcs()
+build_exe(SRCS ${SOURCES} LIBS ${PROJECT_NAME} SUFFIX "-tests")
 ```
 
 ### <a name="test_project.cmake" href="cmake/Modules/test_project.txt">test_project.cmake</a>
 
-Instructions ini this file are similar to [x86_project.cmake](#x86_project.cmake), except only
+Instructions in this file are similar to [x86_project.cmake](#x86_project.cmake), except only
 an executable is needed which should be linked with google test and Boost libraries:
 
 ```
 include(gtest)
 ...
-add_executable(${PROJECT_NAME}${EXE_SUFFIX} ${SOURCES})
+function (build_exe)
+  cmake_parse_arguments(p "" "SUFFIX" "OBJS;SRCS;LIBS" ${ARGN})
 ...
-target_link_libraries(${PROJECT_NAME}${EXE_SUFFIX}
-  ${EXE_LIBRARIES} ${gtest_LIB_NAME} ${Boost_LIBRARIES})
+target_link_libraries(${TARGET} ${p_LIBS} ${Boost_LIBRARIES} ${gtest_LIB_NAME})
+add_test(NAME ${TARGET} COMMAND $<TARGET_FILE:${TARGET}>)
 ```
 
 ### <a name="gtest.cmake" href="cmake/Modules/gtest.cmake">gtest.cmake</a>
@@ -447,7 +455,6 @@ The file checks and initializes common variables if undefined:
 * CMAKE_CXX_STANDARD
 * CMAKE_RULE_MESSAGES
 * CMAKE_VERBOSE_MAKEFILE
-* LIB_TYPE
 
 ### <a name="unit_testing.cmake" href="cmake/Modules/unit_testing.cmake">unit_testing.cmake</a>
 
