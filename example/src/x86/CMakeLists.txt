@@ -1,12 +1,8 @@
-set(CMAKE_MACOSX_RPATH 1)
+include(x86_project)
 
+set(CMAKE_MACOSX_RPATH 1)
 find_package(Threads)
 
-set(BUILD_LIB ON)
-set(BUILD_EXE ON)
-set(EXE_SUFFIX "-exe")
-
-set(LIB_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
-set(EXE_LIBRARIES ${PROJECT_NAME})
-
-include(x86_project)
+find_srcs(FILTER ${MAIN_SRC})
+build_lib(SRCS "${SOURCES}" LIBS ${CMAKE_THREAD_LIBS_INIT} LIB_TYPE SHARED)
+build_exe(OBJS "${SOURCES_OBJ}" SRCS "${MAIN_SRC}" LIBS ${PROJECT_NAME} SUFFIX "-exe")

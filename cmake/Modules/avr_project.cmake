@@ -6,85 +6,85 @@ endif ()
 
 include(init)
 
-####################################################################################################
-# AVR project {
-
 if (PRINT_BOARDS)
   print_board_list()
 endif ()
 
-include_directories(
-  "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"
-  "${ROOT_SOURCE_DIR}/src/common"
-  "${ROOT_SOURCE_DIR}/include/${PROJECT_NAME}"
-  "${ROOT_SOURCE_DIR}/include"
-)
+if (ENABLE_USB_CON)
+  add_definitions(-DUSB_CON)
+endif ()
 
-file(GLOB_RECURSE SOURCES_SCAN
-  "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}/*.c"
-  "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}/*.cpp"
-  "${ROOT_SOURCE_DIR}/src/common/*.c"
-  "${ROOT_SOURCE_DIR}/src/common/*.cpp")
-list(APPEND SOURCES ${SOURCES_SCAN})
+####################################################################################################
+# Standard set up {
 
-list(LENGTH SOURCES SOURCES_LEN)
+function (setup)
+  include_directories(
+    "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"
+    "${ROOT_SOURCE_DIR}/src/common"
+    "${ROOT_SOURCE_DIR}/include/${PROJECT_NAME}"
+    "${ROOT_SOURCE_DIR}/include"
+  )
 
-if (SOURCES_LEN GREATER 0)
-  if (BUILD_LIB AND BUILD_EXE)
-    message(FATAL_ERROR "Both BUILD_LIB and BUILD_EXE are ON. Use one or the other")
-  endif ()
-
-  add_compile_options(-Wall -Wextra)
   add_definitions(-D${BOARD_FAMILY})
+  add_compile_options(-Wall -Wextra)
+endfunction()
 
-  if (NOT EXISTS ${MAIN_SRC})
-    set(MAIN_SRC "")
+# Call setup as a default step for now.
+setup()
+
+# } Standard setup
+
+####################################################################################################
+# Build library
+
+function (build_lib)
+  cmake_parse_arguments(p "" "SUFFIX" "SRCS;LIBS" ${ARGN})
+
+  set(TARGET ${PROJECT_NAME}${p_SUFFIX})
+  list(LENGTH p_SRCS SRCS_LEN)
+
+  if (SRCS_LEN GREATER 0)
+    message(STATUS "Target: ${TARGET}. Sources: ${p_SRCS}. OBJS: ${p_OBJS}")
+    set(ignore_warning "${BOARD_PORT}")
+
+    generate_arduino_library(
+      ${TARGET}
+      BOARD ${BOARD}
+      BOARD_CPU ${BOARD_CPU}
+      SRCS ${p_SRCS}
+      LIBS ${p_LIBS}
+    )
   else ()
-    list(REMOVE_ITEM SOURCES ${MAIN_SRC})
+    message(STATUS "No sources to build: ${TARGET}")
   endif ()
 
-  if (ENABLE_USB_CON)
-    add_definitions(-DUSB_CON)
-  endif ()
+endfunction ()
 
-  ##############################################################################
-  # Build library
-  message(STATUS "BUILD_LIB: ${BUILD_LIB}")
-  if (BUILD_LIB)
-    list(LENGTH SOURCES SOURCES_LEN)
+####################################################################################################
+# Build executable {
 
-    if (SOURCES_LEN GREATER 0)
-      set(ignore_warning "${BOARD_PORT}")
+function (build_exe)
+  cmake_parse_arguments(p "" "SUFFIX" "SRCS;LIBS" ${ARGN})
 
-      generate_arduino_library(
-        ${PROJECT_NAME}${LIB_SUFFIX}
-        BOARD ${BOARD}
-        BOARD_CPU ${BOARD_CPU}
-        SRCS ${SOURCES}
-        LIBS ${LIB_LIBRARIES}
-      )
-    else ()
-      message(STATUS "Cannot build ${PROJECT_NAME}${LIB_SUFFIX} without sources")
-    endif ()
-  endif ()
+  set(TARGET ${PROJECT_NAME}${EXE_SUFFIX})
+  list(LENGTH p_SRCS SRCS_LEN)
 
-  ##############################################################################
-  # Build executable
-  message(STATUS "BUILD_EXE: ${BUILD_EXE}")
-  if (BUILD_EXE)
+  if (SRCS_LEN GREATER 0)
+    message(STATUS "Target: ${TARGET}. Sources: ${p_SRCS}. OBJS: ${p_OBJS}")
+
     generate_arduino_firmware(
-      ${PROJECT_NAME}${EXE_SUFFIX}
+      ${TARGET}
       BOARD ${BOARD}
       BOARD_CPU ${BOARD_CPU}
       PORT ${BOARD_PORT}
-      SRCS ${MAIN_SRC} ${SOURCES}
-      LIBS ${EXE_LIBRARIES}
+      SRCS ${p_SRCS}
+      LIBS ${p_LIBS}
       AFLAGS -v
     )
+  else ()
+    message(STATUS "No sources to build: ${TARGET}")
   endif ()
 
-else ()
-  message(STATUS "Project ${PROJECT_NAME} has no sources to build")
-endif ()
+endfunction ()
 
-# } AVR project
+# } Build executable 

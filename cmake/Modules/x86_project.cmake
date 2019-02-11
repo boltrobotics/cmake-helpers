@@ -5,75 +5,89 @@ else ()
 endif ()
 
 ####################################################################################################
-# x86 project {
+# Standard set up {
 
-include_directories(
-  "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"
-  "${ROOT_SOURCE_DIR}/src/common"
-  "${ROOT_SOURCE_DIR}/include/${PROJECT_NAME}"
-  "${ROOT_SOURCE_DIR}/include"
-)
-
-file(GLOB_RECURSE SOURCES_SCAN
-  "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}/*.c"
-  "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}/*.cpp"
-  "${ROOT_SOURCE_DIR}/src/common/*.c"
-  "${ROOT_SOURCE_DIR}/src/common/*.cpp")
-list(APPEND SOURCES ${SOURCES_SCAN})
-
-if (REMOVE_SOURCES)
-  message(STATUS "Removing sources from ${PROJECT_NAME}: ${REMOVE_SOURCES}")
-  list(REMOVE_ITEM SOURCES ${REMOVE_SOURCES})
-endif()
-
-message(STATUS "${PROJECT_NAME} SOURCES: ${SOURCES}")
-
-list(LENGTH SOURCES SOURCES_LEN)
-
-if (SOURCES_LEN GREATER 0)
+function (setup)
+  include_directories(
+    "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"
+    "${ROOT_SOURCE_DIR}/src/common"
+    "${ROOT_SOURCE_DIR}/include/${PROJECT_NAME}"
+    "${ROOT_SOURCE_DIR}/include"
+  )
 
   add_definitions(-D${BOARD_FAMILY})
   add_compile_options(-Wall -Wextra -Werror)
+endfunction()
 
-  if (NOT EXISTS ${MAIN_SRC})
-    set(MAIN_SRC "")
-  else ()
-    list(REMOVE_ITEM SOURCES ${MAIN_SRC})
-  endif ()
+# Call setup as a default step for now.
+setup()
 
-  ##############################################################################
-  # Build object files
-  add_library(${PROJECT_NAME}_o OBJECT ${SOURCES})
+# } Standard setup
 
-  string(COMPARE EQUAL "${LIB_TYPE}" SHARED _cmp)
-  if (_cmp)
-    set_property(TARGET ${PROJECT_NAME}_o PROPERTY POSITION_INDEPENDENT_CODE ON)
-  endif ()
+####################################################################################################
+# Build library
 
-  ##############################################################################
-  # Build library
-  message(STATUS "BUILD_LIB: ${BUILD_LIB}")
-  if (BUILD_LIB)
-    list(LENGTH SOURCES SOURCES_LEN)
+function (build_lib)
+  cmake_parse_arguments(p "" "SUFFIX;LIB_TYPE" "OBJS;SRCS;LIBS" ${ARGN})
 
-    if (SOURCES_LEN GREATER 0)
-      add_library(${PROJECT_NAME}${LIB_SUFFIX} ${LIB_TYPE} $<TARGET_OBJECTS:${PROJECT_NAME}_o>)
-      target_link_libraries(${PROJECT_NAME}${LIB_SUFFIX} PRIVATE ${LIB_LIBRARIES})
-    else ()
-      message(STATUS "Cannot build ${PROJECT_NAME}${LIB_SUFFIX} without sources")
+  set(TARGET ${PROJECT_NAME}${p_SUFFIX})
+  list(LENGTH p_OBJS OBJS_LEN)
+  list(LENGTH p_SRCS SRCS_LEN)
+
+  if (SRCS_LEN GREATER 0 OR OBJS_LEN GREATER 0)
+    message(STATUS "Target: ${TARGET}. Sources: ${p_SRCS}. OBJS: ${p_OBJS}")
+
+    # Build object files
+    add_library(${TARGET}_o OBJECT ${p_SRCS})
+
+    if (p_LIB_TYPE) 
+      string(COMPARE EQUAL ${p_LIB_TYPE} SHARED _cmp)
+      if (_cmp)
+        set_property(TARGET ${TARGET}_o PROPERTY POSITION_INDEPENDENT_CODE ON)
+      endif ()
     endif ()
+
+    set(SOURCES_OBJ ${TARGET}_o PARENT_SCOPE)
+
+    if (OBJS_LEN GREATER 0)
+      add_library(${TARGET} ${p_LIB_TYPE} $<TARGET_OBJECTS:${TARGET}_o> $<TARGET_OBJECTS:${p_OBJS}>)
+    else ()
+      add_library(${TARGET} ${p_LIB_TYPE} $<TARGET_OBJECTS:${TARGET}_o>)
+    endif ()
+
+    target_link_libraries(${TARGET} PRIVATE ${p_LIBS})
+
+  else ()
+    message(STATUS "No sources to build: ${TARGET}")
   endif ()
 
-  ##############################################################################
-  # Build executable
-  message(STATUS "BUILD_EXE: ${BUILD_EXE}")
-  if (BUILD_EXE)
-    add_executable(${PROJECT_NAME}${EXE_SUFFIX} ${MAIN_SRC} $<TARGET_OBJECTS:${PROJECT_NAME}_o>)
-    target_link_libraries(${PROJECT_NAME}${EXE_SUFFIX} ${EXE_LIBRARIES})
+endfunction ()
+
+# } Build library
+
+####################################################################################################
+# Build executable {
+
+function (build_exe)
+  cmake_parse_arguments(p "" "SUFFIX" "OBJS;SRCS;LIBS" ${ARGN})
+
+  set(TARGET ${PROJECT_NAME}${p_SUFFIX})
+  list(LENGTH p_SRCS SRCS_LEN)
+  list(LENGTH p_OBJS OBJS_LEN)
+
+  if (SRCS_LEN GREATER 0 OR OBJS_LEN GREATER 0)
+    message(STATUS "Target: ${TARGET}. Sources: ${p_SRCS}. OBJS: ${p_OBJS}")
+
+    if (OBJS_LEN GREATER 0)
+      add_executable(${TARGET} ${p_SRCS} $<TARGET_OBJECTS:${p_OBJS}>)
+    else ()
+      add_executable(${TARGET} ${p_SRCS})
+    endif ()
+    target_link_libraries(${TARGET} ${p_LIBS})
+  else ()
+    message(STATUS "No sources to build: ${TARGET}")
   endif ()
 
-else ()
-  message(STATUS "Project ${PROJECT_NAME} has no sources to build. Root: ${ROOT_SOURCE_DIR}")
-endif ()
+endfunction ()
 
-# } x86 project
+# } Build executable 

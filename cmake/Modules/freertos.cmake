@@ -58,10 +58,10 @@ if (NOT FREERTOS_SRC_FILES)
     queue.c
     tasks.c
     # Add these as needed
-    croutine.c
-    event_groups.c
-    stream_buffer.c
-    timers.c
+    #croutine.c
+    #event_groups.c
+    #stream_buffer.c
+    #timers.c
   )
 endif ()
 

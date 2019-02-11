@@ -37,6 +37,8 @@ endif ()
 
 message(STATUS "ROOT_SOURCE_DIR: ${ROOT_SOURCE_DIR}")
 
+set(MAIN_SRC ${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}/main.cpp)
+
 ####################################################################################################
 # Cross-compilation {
 
@@ -51,6 +53,45 @@ if (NOT LIB_TYPE)
   set(LIB_TYPE SHARED)
 endif ()
 
-set(MAIN_SRC ${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}/main.cpp)
-
 # } Cross-compilation
+
+####################################################################################################
+# Find sources recursively {
+
+function (find_srcs)
+  cmake_parse_arguments(p "" "" "FILTER" ${ARGN})
+
+  file(GLOB_RECURSE SOURCES_SCAN
+    "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}/*.c"
+    "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}/*.cpp"
+    "${ROOT_SOURCE_DIR}/src/common/*.c"
+    "${ROOT_SOURCE_DIR}/src/common/*.cpp")
+
+  list(LENGTH p_FILTER FILTER_LEN)
+
+  if (FILTER_LEN GREATER 0)
+    message(STATUS  "Exclude sources: ${p_FILTER}")
+    list(REMOVE_ITEM SOURCES_SCAN ${p_FILTER})
+  endif ()
+
+  set(SOURCES ${SOURCES_SCAN} PARENT_SCOPE)
+endfunction ()
+
+function (find_test_srcs)
+  cmake_parse_arguments(p "" "" "FILTER" ${ARGN})
+
+  file(GLOB_RECURSE SOURCES_SCAN
+    "${ROOT_SOURCE_DIR}/test/*.c"
+    "${ROOT_SOURCE_DIR}/test/*.cpp")
+
+  list(LENGTH p_FILTER FILTER_LEN)
+
+  if (FILTER_LEN GREATER 0)
+    message(STATUS  "Exclude test sources: ${p_FILTER}")
+    list(REMOVE_ITEM SOURCES_SCAN ${p_FILTER})
+  endif ()
+
+  set(SOURCES ${SOURCES_SCAN} PARENT_SCOPE)
+endfunction ()
+
+# } Find sources recursively

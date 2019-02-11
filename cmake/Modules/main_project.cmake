@@ -31,8 +31,6 @@ function(add_target_config_args)
       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
       -DBOARD_FAMILY=${BOARD_FAMILY}
       -DOUTPUT_PATH=${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}
-      -DBUILD_LIB=${BUILD_LIB}
-      -DBUILD_EXE=${BUILD_EXE}
       ${ARGN}
   )
 endfunction()

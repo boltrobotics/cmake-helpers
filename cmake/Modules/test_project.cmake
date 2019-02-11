@@ -1,35 +1,53 @@
 include(gtest)
 
 ####################################################################################################
-# unit tests {
+# Standard set up {
 
-add_definitions(-D${BOARD_FAMILY})
+function (setup)
+  include_directories(
+    "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"
+    "${ROOT_SOURCE_DIR}/src/common"
+    "${ROOT_SOURCE_DIR}/include/${PROJECT_NAME}"
+    "${ROOT_SOURCE_DIR}/include"
+    "${gtest_INC_DIR}"
+  )
 
-include_directories(
-  "${PROJECT_SOURCE_DIR}/src/${BOARD_FAMILY}"
-  "${PROJECT_SOURCE_DIR}/src/common"
-  "${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}"
-  "${PROJECT_SOURCE_DIR}/include"
-  "${gtest_INC_DIR}"
-)
+  add_definitions(-D${BOARD_FAMILY})
+  add_compile_options(-Wall -Wextra -Werror)
+endfunction()
 
-file(GLOB_RECURSE SOURCES_SCAN
-  "${PROJECT_SOURCE_DIR}/test/*.c"
-  "${PROJECT_SOURCE_DIR}/test/*.cpp")
-list(APPEND SOURCES ${SOURCES_SCAN})
+# Call setup as a default step for now.
+setup()
 
-if (REMOVE_SOURCES)
-  message(STATUS "Removing sources from ${PROJECT_NAME}: ${REMOVE_SOURCES}")
-  list(REMOVE_ITEM SOURCES ${REMOVE_SOURCES})
-endif()
+# } Standard setup
 
-add_compile_options(-Wall -Wextra -Werror)
+####################################################################################################
+# Build executable {
 
-add_executable(${PROJECT_NAME}${EXE_SUFFIX} ${SOURCES})
-set_property(TARGET ${PROJECT_NAME}${EXE_SUFFIX} PROPERTY install_rpath "@loader_path/../lib")
-target_link_libraries(${PROJECT_NAME}${EXE_SUFFIX}
-  ${EXE_LIBRARIES} ${gtest_LIB_NAME} ${Boost_LIBRARIES})
+function (build_exe)
+  cmake_parse_arguments(p "" "SUFFIX" "OBJS;SRCS;LIBS" ${ARGN})
 
-add_test(NAME ${PROJECT_NAME}${EXE_SUFFIX} COMMAND $<TARGET_FILE:${PROJECT_NAME}${EXE_SUFFIX}>)
+  set(TARGET ${PROJECT_NAME}${p_SUFFIX})
+  list(LENGTH p_SRCS SRCS_LEN)
+  list(LENGTH p_OBJS OBJS_LEN)
 
-# } unit tests
+  if (SRCS_LEN GREATER 0 OR OBJS_LEN GREATER 0)
+    message(STATUS "Target: ${TARGET}. Sources: ${p_SRCS}. OBJS: ${p_OBJS}")
+
+    if (OBJS_LEN GREATER 0)
+      add_executable(${TARGET} ${p_SRCS} $<TARGET_OBJECTS:${p_OBJS}>)
+    else ()
+      add_executable(${TARGET} ${p_SRCS})
+    endif ()
+
+    set_property(TARGET ${TARGET} PROPERTY install_rpath "@loader_path/../lib")
+    target_link_libraries(${TARGET} ${p_LIBS} ${Boost_LIBRARIES} ${gtest_LIB_NAME})
+    add_test(NAME ${TARGET} COMMAND $<TARGET_FILE:${TARGET}>)
+
+  else ()
+    message(STATUS "No sources to build: ${TARGET}")
+  endif ()
+
+endfunction ()
+
+# } Build executable 

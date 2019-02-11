@@ -1,3 +1,4 @@
-set(EXE_LIBRARIES ${PROJECT_NAME})
-set(EXE_SUFFIX "-tests")
 include(test_project)
+
+find_test_srcs()
+build_exe(SRCS ${SOURCES} LIBS ${PROJECT_NAME} SUFFIX "-tests")

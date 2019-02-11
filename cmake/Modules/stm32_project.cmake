@@ -6,67 +6,81 @@ endif ()
 
 include(init)
 
-####################################################################################################
-# stm32 project {
-
 if (PRINT_FLAGS)
   print_compile_flags()
 endif ()
 
-include_directories(
-  "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"
-  "${ROOT_SOURCE_DIR}/src/common"
-  "${ROOT_SOURCE_DIR}/include/${PROJECT_NAME}"
-  "${ROOT_SOURCE_DIR}/include"
-)
+####################################################################################################
+# Standard set up {
 
-file(GLOB_RECURSE SOURCES_SCAN
-  "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}/*.c"
-  "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}/*.cpp"
-  "${ROOT_SOURCE_DIR}/src/common/*.c"
-  "${ROOT_SOURCE_DIR}/src/common/*.cpp")
-list(APPEND SOURCES ${SOURCES_SCAN})
-
-list(LENGTH SOURCES SOURCES_LEN)
-
-if (SOURCES_LEN GREATER 0)
-  if (BUILD_LIB AND BUILD_EXE)
-    message(FATAL_ERROR "Both BUILD_LIB and BUILD_EXE are ON. Use one or the other")
-  endif ()
+function (setup)
+  include_directories(
+    "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"
+    "${ROOT_SOURCE_DIR}/src/common"
+    "${ROOT_SOURCE_DIR}/include/${PROJECT_NAME}"
+    "${ROOT_SOURCE_DIR}/include"
+  )
 
   add_definitions(-DSTM32${STM32_FAMILY} -D${BOARD_FAMILY})
+endfunction()
 
-  if (NOT EXISTS ${MAIN_SRC})
-    set(MAIN_SRC "")
-  else ()
-    list(REMOVE_ITEM SOURCES ${MAIN_SRC})
-  endif ()
+# Call setup as a default step for now.
+setup()
 
-  list(LENGTH SOURCES SOURCES_LEN)
+# } Standard setup
 
-  ##############################################################################
-  # Build library
-  message(STATUS "BUILD_LIB: ${BUILD_LIB}")
-  if (BUILD_LIB)
-    set(TARGET ${PROJECT_NAME}${LIB_SUFFIX})
+####################################################################################################
+# Build library
 
-    if (SOURCES_LEN GREATER 0)
-      add_library(${TARGET} ${SOURCES})
-      target_link_libraries(${TARGET} ${LIB_LIBRARIES})
-      STM32_SET_TARGET_PROPERTIES(${TARGET})
+function (build_lib)
+  cmake_parse_arguments(p "" "SUFFIX" "OBJS;SRCS;LIBS" ${ARGN})
+
+  set(TARGET ${PROJECT_NAME}${p_SUFFIX})
+  list(LENGTH p_OBJS OBJS_LEN)
+  list(LENGTH p_SRCS SRCS_LEN)
+
+  if (SRCS_LEN GREATER 0 OR OBJS_LEN GREATER 0)
+    message(STATUS "Target: ${TARGET}. Sources: ${p_SRCS}. OBJS: ${p_OBJS}")
+
+    # Build object files
+    add_library(${TARGET}_o OBJECT ${p_SRCS})
+    set(SOURCES_OBJ ${TARGET}_o PARENT_SCOPE)
+
+    if (OBJS_LEN GREATER 0)
+      add_library(${TARGET} $<TARGET_OBJECTS:${TARGET}_o> $<TARGET_OBJECTS:${p_OBJS}>)
     else ()
-      message(STATUS "Cannot build ${TARGET} without sources")
+      add_library(${TARGET} $<TARGET_OBJECTS:${TARGET}_o>)
     endif ()
+
+    target_link_libraries(${TARGET} ${p_LIBS})
+    STM32_SET_TARGET_PROPERTIES(${TARGET})
+  else ()
+    message(STATUS "No sources to build: ${TARGET}")
   endif ()
+endfunction ()
 
-  ##############################################################################
-  # Build executable
-  message(STATUS "BUILD_EXE: ${BUILD_EXE}")
-  if (BUILD_EXE)
-    set(TARGET ${PROJECT_NAME}${EXE_SUFFIX})
+# } Build library
 
-    add_executable(${TARGET} ${MAIN_SRC} ${SOURCES})
-    target_link_libraries(${TARGET} ${EXE_LIBRARIES})
+####################################################################################################
+# Build executable {
+
+function (build_exe)
+  cmake_parse_arguments(p "" "SUFFIX" "OBJS;SRCS;LIBS" ${ARGN})
+
+  set(TARGET ${PROJECT_NAME}${p_SUFFIX})
+  list(LENGTH p_SRCS SRCS_LEN)
+  list(LENGTH p_OBJS OBJS_LEN)
+
+  if (SRCS_LEN GREATER 0 OR OBJS_LEN GREATER 0)
+    message(STATUS "Target: ${TARGET}. Sources: ${p_SRCS}. OBJS: ${p_OBJS}")
+
+    if (OBJS_LEN GREATER 0)
+      add_executable(${TARGET} ${p_SRCS} $<TARGET_OBJECTS:${p_OBJS}>)
+    else ()
+      add_executable(${TARGET} ${p_SRCS})
+    endif ()
+
+    target_link_libraries(${TARGET} ${p_LIBS})
 
     # Sets -DSTM32F1 -DSTM32F103xB, -T<linker_script>.
     # Note linker script is copied and renamed to "PROJECT_NAME_flash.ld"
@@ -78,10 +92,10 @@ if (SOURCES_LEN GREATER 0)
       --target ${TARGET}.bin)
     add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND ${CMAKE_COMMAND} --build .
       --target ${TARGET}.hex)
+  else ()
+    message(STATUS "No sources to build: ${TARGET}")
   endif ()
 
-else ()
-  message(STATUS "Project ${PROJECT_NAME} has no sources to build")
-endif ()
+endfunction ()
 
-# } stm32 project
+# } Build executable 
