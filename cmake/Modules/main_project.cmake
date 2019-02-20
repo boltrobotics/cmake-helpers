@@ -67,9 +67,11 @@ else ()
     set(BOARD $ENV{BOARD})
     set(BOARD_CPU $ENV{BOARD_CPU})
     set(BOARD_PORT $ENV{BOARD_PORT})
+    set(PRINT_BOARDS $ENV{PRINT_BOARDS})
     set(BIN_DIR ${PROJECT_BINARY_DIR}/src/${BOARD_FAMILY})
 
-    add_target_config_args(-DBOARD=${BOARD} -DBOARD_CPU=${BOARD_CPU} -DBOARD_PORT=${BOARD_PORT})
+    add_target_config_args(-DBOARD=${BOARD} -DBOARD_CPU=${BOARD_CPU} -DBOARD_PORT=${BOARD_PORT}
+      -DPRINT_BOARDS=${PRINT_BOARDS})
     add_target_build(${BIN_DIR} ${PROJECT_NAME})
     add_target_flash(${BIN_DIR} ${PROJECT_NAME} ${OUTPUT_PATH} ${BOARD_FAMILY})
 
