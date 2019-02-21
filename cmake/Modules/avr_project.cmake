@@ -72,6 +72,12 @@ function (setup)
     set(CMAKE_CXX_FLAGS_DEBUG "-O0 -save-temps -g -gdwarf-3 -gstrict-dwarf" PARENT_SCOPE)
   endif ()
 
+  if (NOT MCU_SPEED)
+    set(MCU_SPEED "16000000UL")
+    set(MCU_SPEED ${MCU_SPEED} PARENT_SCOPE)
+    message(STATUS "${BoldYellow}MCU_SPEED default: ${MCU_SPEED}${ColourReset}")
+  endif ()
+
   add_definitions(-D${BOARD_FAMILY} -DF_CPU=${MCU_SPEED})
   add_compile_options(-Wall -Wextra -pedantic -pedantic-errors)
   add_compile_options(-fpack-struct -fshort-enums -funsigned-char -funsigned-bitfields)

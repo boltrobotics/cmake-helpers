@@ -242,35 +242,23 @@ endfunction (add_avr_executable)
 # This needs to be used for linking against the library, e.g. calling
 # target_link_libraries(...).
 ##########################################################################
+
 function(add_avr_library LIBRARY_NAME)
-    if(NOT ARGN)
-        message(FATAL_ERROR "No source files given for ${LIBRARY_NAME}.")
-    endif(NOT ARGN)
+  if (NOT ARGN)
+    message(FATAL_ERROR "No source files given for ${LIBRARY_NAME}.")
+  endif(NOT ARGN)
 
-    set(lib_file ${LIBRARY_NAME}${MCU_TYPE_FOR_FILENAME})
+  set(lib_file ${LIBRARY_NAME}${MCU_TYPE_FOR_FILENAME})
 
-    add_library(${lib_file} STATIC ${ARGN})
+  add_library(${lib_file} STATIC ${ARGN})
 
-    set_target_properties(
-            ${lib_file}
-            PROPERTIES
-            COMPILE_FLAGS "-mmcu=${AVR_MCU}"
-            OUTPUT_NAME "${lib_file}"
-    )
+  set_target_properties(
+    ${lib_file} PROPERTIES COMPILE_FLAGS "-mmcu=${AVR_MCU}" OUTPUT_NAME "${lib_file}")
 
-    if(NOT TARGET ${LIBRARY_NAME})
-        add_custom_target(
-                ${LIBRARY_NAME}
-                ALL
-                DEPENDS ${lib_file}
-        )
-
-        set_target_properties(
-                ${LIBRARY_NAME}
-                PROPERTIES
-                OUTPUT_NAME "${lib_file}"
-        )
-    endif(NOT TARGET ${LIBRARY_NAME})
+  if (NOT TARGET ${LIBRARY_NAME})
+    add_custom_target( ${LIBRARY_NAME} ALL DEPENDS ${lib_file})
+    set_target_properties( ${LIBRARY_NAME} PROPERTIES OUTPUT_NAME "${lib_file}")
+  endif ()
 
 endfunction(add_avr_library)
 
@@ -282,23 +270,25 @@ endfunction(add_avr_library)
 # Calls target_link_libraries with AVR target names (concatenation,
 # extensions and so on.
 ##########################################################################
+
 function(avr_target_link_libraries EXECUTABLE_TARGET)
-   if(NOT ARGN)
-      message(FATAL_ERROR "Nothing to link to ${EXECUTABLE_TARGET}.")
-   endif(NOT ARGN)
+  if (NOT ARGN)
+    message(FATAL_ERROR "Nothing to link to ${EXECUTABLE_TARGET}.")
+  endif(NOT ARGN)
 
-   get_target_property(TARGET_LIST ${EXECUTABLE_TARGET} OUTPUT_NAME)
+  get_target_property(TARGET_LIST ${EXECUTABLE_TARGET} OUTPUT_NAME)
 
-   foreach(TGT ${ARGN})
-      if(TARGET ${TGT})
-         get_target_property(ARG_NAME ${TGT} OUTPUT_NAME)
-         list(APPEND NON_TARGET_LIST ${ARG_NAME})
-      else(TARGET ${TGT})
-         list(APPEND NON_TARGET_LIST ${TGT})
-      endif(TARGET ${TGT})
-   endforeach(TGT ${ARGN})
+  foreach (TGT ${ARGN})
+    if (TARGET ${TGT})
+      get_target_property(ARG_NAME ${TGT} OUTPUT_NAME)
+      list(APPEND NON_TARGET_LIST ${ARG_NAME})
+    else ()
+      list(APPEND NON_TARGET_LIST ${TGT})
+    endif ()
+  endforeach ()
 
-   target_link_libraries(${TARGET_LIST} ${NON_TARGET_LIST})
+  target_link_libraries(${TARGET_LIST} ${NON_TARGET_LIST})
+
 endfunction(avr_target_link_libraries EXECUTABLE_TARGET)
 
 ##########################################################################
