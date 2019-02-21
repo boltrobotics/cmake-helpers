@@ -1,11 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 set(CMAKE_MODULE_PATH $ENV{CMAKEHELPERS_HOME}/cmake/Modules)
 
-include(avr_project)
-
-set(AVR_UPLOADTOOL_PORT /dev/tty.usbmodemFD14511)
-setup_mega()
-setup()
+include(arduino_project)
 
 find_srcs()
 build_exe(SRCS ${SOURCES})

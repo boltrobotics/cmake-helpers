@@ -4,7 +4,7 @@
 // SYSTEM INCLUDES
 #if defined(x86)
 #include <iostream>
-#elif defined(avr)
+#elif defined(ard)
 #include <Arduino.h>
 #endif
 
@@ -28,9 +28,10 @@ bool Example::hello()
 {
 #if defined(x86)
   std::cout << "Hello" << std::endl;
-#elif defined(avr)
-  Serial.println("Hello");
 #elif defined (stm32)
+#elif defined(avr)
+#elif defined(ard)
+  Serial.println("Hello");
 #endif
   return true;
 }

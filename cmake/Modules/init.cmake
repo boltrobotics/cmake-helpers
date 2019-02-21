@@ -9,8 +9,8 @@ if (NOT CMAKE_VERBOSE_MAKEFILE)
 endif ()
 
 if (NOT CMAKE_BUILD_TYPE)
-  message(STATUS "Setting default CMAKE_BUILD_TYPE to Debug")
-  set(CMAKE_BUILD_TYPE "Debug")
+  set(CMAKE_BUILD_TYPE Release)
+  message(STATUS "Setting default CMAKE_BUILD_TYPE to ${CMAKE_BUILD_TYPE}")
 endif ()
 
 if (NOT OUTPUT_PATH)

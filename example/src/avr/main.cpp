@@ -2,26 +2,33 @@
 // License: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
 // SYSTEM INCLUDES
-#include <Arduino.h>
+#include <avr/io.h>
+#include <util/delay.h>
 
 // PROJECT INCLUDES
 #include "example.hpp"
 
+// Mega2560
+#define DELAY     500
+#define LED_DDR   DDRB
+#define LED_PORT  PORTB
+#define LED_PIN   PB7
+
 btr::Example example;
 
-void setup()
+int main()
 {
-  Serial.begin(9600);
-  pinMode(LED_BUILTIN, OUTPUT);
-}
+  LED_DDR |= (1 << LED_PIN);
 
-void loop()
-{
-	digitalWrite(LED_BUILTIN, HIGH);
-  delay(1000);
+  while (1) {
+    LED_PORT |= (1 << LED_PIN);
+    _delay_ms(DELAY);
 
-  example.hello();
+    example.hello();
 
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(1000);   
+    LED_PORT &= ~(1 << LED_PIN);
+    _delay_ms(DELAY);
+  }
+
+  return 0;
 }

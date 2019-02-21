@@ -17,7 +17,7 @@ include(unit_testing)
 # } unit testing, x86
 
 ####################################################################################################
-# stm32, avr, x86 {
+# stm32, avr, ard, x86 {
 
 function(add_target_config_args)
   add_target_config(
@@ -40,14 +40,13 @@ if (NOT IS_DIRECTORY "${PROJECT_SOURCE_DIR}/src/${BOARD_FAMILY}")
   return()
 endif ()
 
-string(COMPARE EQUAL "${BOARD_FAMILY}" stm32 _cmp)
-if (_cmp)
+if (BOARD_FAMILY MATCHES stm32)
 
   set(TOOLCHAIN_FILE $ENV{STM32CMAKE_HOME}/cmake/gcc_stm32.cmake)
+  set(BIN_DIR ${PROJECT_BINARY_DIR}/src/${BOARD_FAMILY})
   set(STM32_CHIP $ENV{STM32_CHIP})
   set(STM32_FLASH_SIZE $ENV{STM32_FLASH_SIZE})
   set(STM32_RAM_SIZE $ENV{STM32_RAM_SIZE})
-  set(BIN_DIR ${PROJECT_BINARY_DIR}/src/${BOARD_FAMILY})
 
   add_target_config_args(
     -DTOOLCHAIN_PREFIX=/usr/local
@@ -59,29 +58,33 @@ if (_cmp)
   add_target_flash(${BIN_DIR} ${PROJECT_NAME} ${OUTPUT_PATH} ${BOARD_FAMILY}
     ADDR 0x08000000 FLASH_SIZE ${STM32_FLASH_SIZE})
 
-else ()
+elseif (BOARD_FAMILY MATCHES avr)
 
-  string(COMPARE EQUAL "${BOARD_FAMILY}" avr _cmp)
-  if (_cmp)
-    set(TOOLCHAIN_FILE $ENV{ARDUINOCMAKE_HOME}/cmake/ArduinoToolchain.cmake)
-    set(BOARD $ENV{BOARD})
-    set(BOARD_CPU $ENV{BOARD_CPU})
-    set(BOARD_PORT $ENV{BOARD_PORT})
-    set(PRINT_BOARDS $ENV{PRINT_BOARDS})
-    set(BIN_DIR ${PROJECT_BINARY_DIR}/src/${BOARD_FAMILY})
+  set(TOOLCHAIN_FILE $ENV{CMAKEHELPERS_HOME}/cmake/Modules/generic-gcc-avr.cmake)
+  set(BIN_DIR ${PROJECT_BINARY_DIR}/src/${BOARD_FAMILY})
 
-    add_target_config_args(-DBOARD=${BOARD} -DBOARD_CPU=${BOARD_CPU} -DBOARD_PORT=${BOARD_PORT}
-      -DPRINT_BOARDS=${PRINT_BOARDS})
-    add_target_build(${BIN_DIR} ${PROJECT_NAME})
-    add_target_flash(${BIN_DIR} ${PROJECT_NAME} ${OUTPUT_PATH} ${BOARD_FAMILY})
+  add_target_config_args()
+  add_target_build(${BIN_DIR} ${PROJECT_NAME})
+  add_target_flash(${BIN_DIR} ${PROJECT_NAME} ${OUTPUT_PATH} ${BOARD_FAMILY})
 
-  else()
+elseif (BOARD_FAMILY MATCHES ard)
 
-    string(COMPARE EQUAL "${BOARD_FAMILY}" x86 _cmp)
-    if (_cmp)
-      add_subdirectory("${PROJECT_SOURCE_DIR}/src/${BOARD_FAMILY}")
-    endif ()
-  endif ()
+  set(TOOLCHAIN_FILE $ENV{ARDUINOCMAKE_HOME}/cmake/ArduinoToolchain.cmake)
+  set(BIN_DIR ${PROJECT_BINARY_DIR}/src/${BOARD_FAMILY})
+  set(BOARD $ENV{BOARD})
+  set(BOARD_CPU $ENV{BOARD_CPU})
+  set(BOARD_PORT $ENV{BOARD_PORT})
+  set(PRINT_BOARDS $ENV{PRINT_BOARDS})
+
+  add_target_config_args(-DBOARD=${BOARD} -DBOARD_CPU=${BOARD_CPU} -DBOARD_PORT=${BOARD_PORT}
+    -DPRINT_BOARDS=${PRINT_BOARDS})
+  add_target_build(${BIN_DIR} ${PROJECT_NAME})
+  add_target_flash(${BIN_DIR} ${PROJECT_NAME} ${OUTPUT_PATH} ${BOARD_FAMILY})
+
+elseif (BOARD_FAMILY MATCHES x86)
+
+  add_subdirectory("${PROJECT_SOURCE_DIR}/src/${BOARD_FAMILY}")
+
 endif ()
 
-# } stm32, avr, x86
+# } stm32, avr, ard, x86

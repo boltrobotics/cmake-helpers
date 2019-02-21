@@ -53,8 +53,7 @@ endfunction()
 
 function(add_target_flash BIN_DIR BIN_NAME OUT_DIR BOARD_FAMILY)
 
-  string(COMPARE EQUAL "${BOARD_FAMILY}" avr _cmp)
-  if (_cmp)
+  if ((BOARD_FAMILY MATCHES avr) OR (BOARD_FAMILY MATCHES ard))
 
     add_custom_target(
       ${BIN_NAME}-flash
@@ -63,29 +62,26 @@ function(add_target_flash BIN_DIR BIN_NAME OUT_DIR BOARD_FAMILY)
     )
     add_dependencies(${BIN_NAME}-flash ${BIN_NAME})
 
-  else ()
+  elseif (BOARD_FAMILY MATCHES stm32)
 
-    string(COMPARE EQUAL "${BOARD_FAMILY}" stm32 _cmp)
-    if (_cmp)
-      cmake_parse_arguments(p "" "ADDR;FLASH_SIZE" "" ${ARGN})
+    cmake_parse_arguments(p "" "ADDR;FLASH_SIZE" "" ${ARGN})
 
-      if (p_FLASH_SIZE)
-        set(FLASH_SIZE_PARAM "--flash=${p_FLASH_SIZE}")
-      endif()
+    if (p_FLASH_SIZE)
+      set(FLASH_SIZE_PARAM "--flash=${p_FLASH_SIZE}")
+    endif()
 
-      if (NOT STFLASH)
-        set(STFLASH st-flash)
-        message(STATUS "No STFLASH specified, using default: ${STFLASH}")
-      endif ()
-
-      add_custom_target(
-        ${BIN_NAME}-flash
-        WORKING_DIRECTORY ${OUT_DIR}/bin
-        COMMAND ${STFLASH} ${FLASH_SIZE_PARAM} write ${BIN_NAME}.bin ${p_ADDR}
-      )
-      add_dependencies(${BIN_NAME}-flash ${BIN_NAME})
-
+    if (NOT STFLASH)
+      set(STFLASH st-flash)
+      message(STATUS "No STFLASH specified, using default: ${STFLASH}")
     endif ()
+
+    add_custom_target(
+      ${BIN_NAME}-flash
+      WORKING_DIRECTORY ${OUT_DIR}/bin
+      COMMAND ${STFLASH} ${FLASH_SIZE_PARAM} write ${BIN_NAME}.bin ${p_ADDR}
+    )
+    add_dependencies(${BIN_NAME}-flash ${BIN_NAME})
+
   endif ()
 
 endfunction()
