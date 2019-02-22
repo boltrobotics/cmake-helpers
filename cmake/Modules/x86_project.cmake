@@ -15,7 +15,7 @@ function (setup)
     "${ROOT_SOURCE_DIR}/include"
   )
 
-  add_definitions(-D${BOARD_FAMILY})
+  add_definitions(-DBTR_X86=${BTR_X86})
   add_compile_options(-Wall -Wextra -Werror)
 endfunction()
 

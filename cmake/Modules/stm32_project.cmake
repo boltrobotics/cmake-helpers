@@ -21,7 +21,8 @@ function (setup)
     "${ROOT_SOURCE_DIR}/include"
   )
 
-  add_definitions(-DSTM32${STM32_FAMILY} -D${BOARD_FAMILY})
+  add_definitions(-DBTR_STM32=${BTR_STM32})
+  add_definitions(-DSTM32${STM32_FAMILY})
 endfunction()
 
 # Call setup as a default step for now.

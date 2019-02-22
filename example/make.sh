@@ -11,10 +11,10 @@ export STM32CMAKE_HOME=${XTRA_HOME}/stm32-cmake
 export LIBOPENCM3_HOME=${XTRA_HOME}/libopencm3
 export FREERTOS_HOME=${XTRA_HOME}/FreeRTOSv10.1.1
 
-BUILD_X86=0
-BUILD_STM=0
-BUILD_AVR=0
-BUILD_ARD=0
+X86=0
+STM32=0
+AVR=0
+ARD=0
 BOARD_PORT=""
 PULL_XTRA_LIBS=0
 
@@ -36,10 +36,10 @@ help()
 while getopts "xsrab:c:p:uh" Option
 do
   case $Option in
-    x) BUILD_X86=1;;
-    s) BUILD_STM=1;;
-    r) BUILD_AVR=1;;
-    a) BUILD_ARD=1;;
+    x) X86=1;;
+    s) STM32=1;;
+    r) AVR=1;;
+    a) ARD=1;;
     b) BOARD="${OPTARG}";;
     c) BOARD_CPU="${OPTARG}";;
     p) BOARD_PORT="${OPTARG}";;
@@ -71,18 +71,18 @@ if [ "${PULL_XTRA_LIBS}" -eq 1 ]; then
   clone_or_pull "${LIBOPENCM3_HOME}" "https://github.com/libopencm3/libopencm3.git"
 fi
 
-if [ ${BUILD_X86} -eq 1 ]; then
+if [ ${X86} -eq 1 ]; then
   (mkdir -p "build-x86" && cd "build-x86" \
     && cmake \
-      -DBOARD_FAMILY=x86 \
+      -DBTR_X86=1 \
       "$@" .. \
     && make)
 fi
 
-if [ ${BUILD_STM} -eq 1 ]; then
+if [ ${STM32} -eq 1 ]; then
   (mkdir -p "build-stm32" && cd "build-stm32" \
     && cmake \
-      -DBOARD_FAMILY=stm32 \
+      -DBTR_STM32=1 \
       -DSTM32_CHIP=stm32f103c8t6 \
       -DSTM32_FLASH_SIZE=64K \
       -DSTM32_RAM_SIZE=20K \
@@ -90,15 +90,15 @@ if [ ${BUILD_STM} -eq 1 ]; then
     && make)
 fi
 
-if [ ${BUILD_AVR} -eq 1 ]; then
+if [ ${AVR} -eq 1 ]; then
   (mkdir -p "build-avr" && cd "build-avr" \
     && cmake \
-      -DBOARD_FAMILY=avr \
+      -DBTR_AVR=1 \
       "$@" .. \
     && make)
 fi
 
-if [ ${BUILD_ARD} -eq 1 ]; then
+if [ ${ARD} -eq 1 ]; then
   if [ -z ${BOARD} ]; then
     echo "Must specify Arduino board" 
     help
@@ -106,7 +106,7 @@ if [ ${BUILD_ARD} -eq 1 ]; then
   else
     (mkdir -p "build-ard" && cd "build-ard" \
       && cmake \
-        -DBOARD_FAMILY=ard \
+        -DBTR_ARD=1 \
         -DBOARD_PORT=${BOARD_PORT} \
         -DBOARD=${BOARD} \
         -DBOARD_CPU=${BOARD_CPU} \

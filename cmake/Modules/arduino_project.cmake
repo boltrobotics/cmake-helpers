@@ -25,7 +25,7 @@ function (setup)
     "${ROOT_SOURCE_DIR}/include"
   )
 
-  add_definitions(-D${BOARD_FAMILY})
+  add_definitions(-DBTR_ARD=${BTR_ARD})
   add_compile_options(-Wall -Wextra)
 endfunction()
 

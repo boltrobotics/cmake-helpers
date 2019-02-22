@@ -2,9 +2,9 @@
 // License: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
 // SYSTEM INCLUDES
-#if defined(x86)
+#if BTR_X86 > 0
 #include <iostream>
-#elif defined(ard)
+#elif BTR_ARD > 0
 #include <Arduino.h>
 #endif
 
@@ -26,11 +26,11 @@ Example::Example()
 
 bool Example::hello()
 {
-#if defined(x86)
+#if BTR_X86 > 0
   std::cout << "Hello" << std::endl;
-#elif defined (stm32)
-#elif defined(avr)
-#elif defined(ard)
+#elif BTR_STM32 > 0
+#elif BTR_AVR > 0
+#elif BTR_ARD > 0
   Serial.println("Hello");
 #endif
   return true;

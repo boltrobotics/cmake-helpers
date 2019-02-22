@@ -24,7 +24,7 @@ set(M_FLAGS "-mthumb -mcpu=cortex-m3 -mabi=aapcs -msoft-float -mfix-cortex-m3-ld
 set(F_FLAGS "-fno-builtin -ffunction-sections -fdata-sections -fno-common -fomit-frame-pointer")
 set(F_FLAGS "${F_FLAGS} -fno-unroll-loops -ffast-math -ftree-vectorize -fno-exceptions")
 set(F_FLAGS "${F_FLAGS} -fno-unwind-tables")
-set(W_FLAGS "-Wall -Wextra -Wshadow -Wredundant-decls -Wundef")
+set(W_FLAGS "-Wall -Wextra -Wshadow -Wredundant-decls")
 
 set(CMAKE_CXX_FLAGS "${O_FLAGS} ${M_FLAGS} ${F_FLAGS} ${W_FLAGS}")
 set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS}")

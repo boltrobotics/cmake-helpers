@@ -12,7 +12,7 @@ function (setup)
     "${gtest_INC_DIR}"
   )
 
-  add_definitions(-D${BOARD_FAMILY})
+  add_definitions(-DBTR_X86=${BTR_X86})
   add_compile_options(-Wall -Wextra -Werror)
 endfunction()
 

@@ -18,6 +18,19 @@ if (NOT WIN32)
   set(BoldWhite   "${Esc}[1;37m")
 endif()
 
+if (BTR_X86 GREATER 0)
+  set(BOARD_FAMILY x86)
+elseif (BTR_STM32 GREATER 0)
+  set(BOARD_FAMILY stm32)
+elseif (BTR_AVR GREATER 0)
+  set(BOARD_FAMILY avr)
+elseif (BTR_ARD GREATER 0)
+  set(BOARD_FAMILY ard)
+else ()
+  set(BTR_X86 1)
+  set(BOARD_FAMILY x86)
+endif ()
+
 if (NOT CMAKE_RULE_MESSAGES)
   message(STATUS "Setting default CMAKE_RULE_MESSAGES to OFF")
   set(CMAKE_RULE_MESSAGES OFF)
@@ -39,44 +52,32 @@ endif ()
 
 set(EXECUTABLE_OUTPUT_PATH "${OUTPUT_PATH}/bin")
 set(LIBRARY_OUTPUT_PATH "${OUTPUT_PATH}/lib")
-
 set(CMAKE_CXX_STANDARD 14)
-
-function(print_variables)
-  get_cmake_property(_VAR_NAMES VARIABLES)
-
-  list (SORT _VAR_NAMES)
-  foreach (_VAR_NAME ${_VAR_NAMES})
-    message(STATUS "+++ ${_VAR_NAME}=${${_VAR_NAME}}")
-  endforeach()
-endfunction()
 
 if (NOT ROOT_SOURCE_DIR)
   set(ROOT_SOURCE_DIR ${PROJECT_SOURCE_DIR})
 endif ()
 
 message(STATUS "ROOT_SOURCE_DIR: ${ROOT_SOURCE_DIR}")
-
 set(MAIN_SRC ${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}/main.cpp)
 
 ####################################################################################################
-# Cross-compilation {
+# Print all variables {
 
-set(BOARD_FAMILY $ENV{BOARD_FAMILY})
+function(print_variables)
+  get_cmake_property(_VAR_NAMES VARIABLES)
 
-if (NOT BOARD_FAMILY)
-  message(STATUS "Setting default BOARD_FAMILY to x86 (options: x86 | stm32 | avr)")
-  set(BOARD_FAMILY "x86")
-endif()
+  list (SORT _VAR_NAMES)
 
-if (NOT LIB_TYPE)
-  set(LIB_TYPE SHARED)
-endif ()
+  foreach (_VAR_NAME ${_VAR_NAMES})
+    message(STATUS "+++ ${_VAR_NAME}=${${_VAR_NAME}}")
+  endforeach()
+endfunction()
 
-# } Cross-compilation
+# } Print all variables
 
 ####################################################################################################
-# Find sources recursively {
+# Find sources {
 
 function (find_srcs)
   cmake_parse_arguments(p "" "" "FILTER" ${ARGN})
@@ -97,6 +98,11 @@ function (find_srcs)
   set(SOURCES ${SOURCES_SCAN} PARENT_SCOPE)
 endfunction ()
 
+# } Find sources
+
+####################################################################################################
+# Find test sources {
+
 function (find_test_srcs)
   cmake_parse_arguments(p "" "" "FILTER" ${ARGN})
 
@@ -114,4 +120,4 @@ function (find_test_srcs)
   set(SOURCES ${SOURCES_SCAN} PARENT_SCOPE)
 endfunction ()
 
-# } Find sources recursively
+# } Find test sources

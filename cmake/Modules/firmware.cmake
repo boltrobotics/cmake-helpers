@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.7)
 
 ####################################################################################################
 # config {
@@ -51,9 +51,9 @@ endfunction()
 ####################################################################################################
 # flash {
 
-function(add_target_flash BIN_DIR BIN_NAME OUT_DIR BOARD_FAMILY)
+function(add_target_flash BIN_DIR BIN_NAME OUT_DIR)
 
-  if ((BOARD_FAMILY MATCHES avr) OR (BOARD_FAMILY MATCHES ard))
+  if ((BTR_AVR GREATER 0) OR (BTR_ARD GREATER 0))
 
     add_custom_target(
       ${BIN_NAME}-flash
@@ -62,7 +62,7 @@ function(add_target_flash BIN_DIR BIN_NAME OUT_DIR BOARD_FAMILY)
     )
     add_dependencies(${BIN_NAME}-flash ${BIN_NAME})
 
-  elseif (BOARD_FAMILY MATCHES stm32)
+  elseif (BTR_STM32 GREATER 0)
 
     cmake_parse_arguments(p "" "ADDR;FLASH_SIZE" "" ${ARGN})
 
