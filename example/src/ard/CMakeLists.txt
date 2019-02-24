@@ -3,5 +3,6 @@ set(CMAKE_MODULE_PATH $ENV{CMAKEHELPERS_HOME}/cmake/Modules)
 
 include(arduino_project)
 
+setup();
 find_srcs()
 build_exe(SRCS ${SOURCES})

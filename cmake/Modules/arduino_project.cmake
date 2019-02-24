@@ -29,9 +29,6 @@ function (setup)
   add_compile_options(-Wall -Wextra)
 endfunction()
 
-# Call setup as a default step for now.
-setup()
-
 # } Standard setup
 
 ####################################################################################################
