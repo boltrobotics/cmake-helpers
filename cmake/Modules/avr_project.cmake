@@ -8,7 +8,7 @@ include(init)
 
 ####################################################################################################
 # Arduino boards {
-# See: /Applications/Arduino.app/Contents/Java/hardware/arduino/avr/boards.txt
+# See: $ENV{ARDUINOCOREAVR_HOME}/boards.txt
 
 function(setup_mega)
   set(MCU_SPEED "16000000UL" PARENT_SCOPE)

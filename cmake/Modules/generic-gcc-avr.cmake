@@ -141,28 +141,48 @@ endfunction ()
 # target_link_libraries(<EXECUTABLE_NAME>-${AVR_MCU}.elf ...).
 ##########################################################################
 function(add_avr_executable EXECUTABLE_NAME)
-
   if (NOT ARGN)
     message(FATAL_ERROR "No source files given for ${EXECUTABLE_NAME}.")
   endif(NOT ARGN)
 
   # set file names
   set(FPATH ${EXECUTABLE_OUTPUT_PATH})
-  set(ELF_TARGET ${EXECUTABLE_NAME}${MCU_TYPE_FOR_FILENAME}.elf)
-  set(elf_file ${FPATH}/${EXECUTABLE_NAME}${MCU_TYPE_FOR_FILENAME}.elf)
+  set(elf_file ${EXECUTABLE_NAME}${MCU_TYPE_FOR_FILENAME}.elf)
   set(hex_file ${FPATH}/${EXECUTABLE_NAME}${MCU_TYPE_FOR_FILENAME}.hex)
   set(lst_file ${FPATH}/${EXECUTABLE_NAME}${MCU_TYPE_FOR_FILENAME}.lst)
   set(map_file ${FPATH}/${EXECUTABLE_NAME}${MCU_TYPE_FOR_FILENAME}.map)
   set(eeprom_image ${FPATH}/${EXECUTABLE_NAME}${MCU_TYPE_FOR_FILENAME}-eeprom.hex)
 
   # elf file
-  add_executable(${ELF_TARGET} EXCLUDE_FROM_ALL ${ARGN})
+  add_executable(${elf_file} EXCLUDE_FROM_ALL ${ARGN})
 
   set_target_properties(
-    ${ELF_TARGET}
+    ${elf_file}
     PROPERTIES
       COMPILE_FLAGS "-mmcu=${AVR_MCU}"
       LINK_FLAGS "-mmcu=${AVR_MCU} -Wl,--gc-sections -mrelax -Wl,-Map,${map_file}"
+  )
+
+  add_custom_command(
+    OUTPUT ${hex_file}
+    COMMAND ${AVR_OBJCOPY} -j .text -j .data -O ihex ${FPATH}/${elf_file} ${hex_file}
+    COMMAND ${AVR_SIZE_TOOL} ${AVR_SIZE_ARGS} ${FPATH}/${elf_file}
+    DEPENDS ${elf_file}
+  )
+
+  add_custom_command(
+    OUTPUT ${lst_file}
+    COMMAND ${AVR_OBJDUMP} -d ${FPATH}/${elf_file} > ${lst_file}
+    DEPENDS ${elf_file}
+  )
+
+  add_custom_command(
+    OUTPUT ${eeprom_image}
+    COMMAND
+      ${AVR_OBJCOPY} -j .eeprom --set-section-flags=.eeprom=alloc,load
+      --change-section-lma .eeprom=0 --no-change-warnings
+      -O ihex ${FPATH}/${elf_file} ${eeprom_image}
+    DEPENDS ${elf_file}
   )
 
   add_custom_target(
@@ -173,29 +193,8 @@ function(add_avr_executable EXECUTABLE_NAME)
 
   set_target_properties(
     ${EXECUTABLE_NAME}
-    PROPERTIES OUTPUT_NAME "${elf_file}"
-  )
-
-  add_custom_command(
-    OUTPUT ${hex_file}
-    COMMAND ${AVR_OBJCOPY} -j .text -j .data -O ihex ${elf_file} ${hex_file}
-    COMMAND ${AVR_SIZE_TOOL} ${AVR_SIZE_ARGS} ${elf_file}
-    DEPENDS ${ELF_TARGET}
-  )
-
-  add_custom_command(
-    OUTPUT ${lst_file}
-    COMMAND ${AVR_OBJDUMP} -d ${elf_file} > ${lst_file}
-    DEPENDS ${ELF_TARGET}
-  )
-
-  add_custom_command(
-    OUTPUT ${eeprom_image}
-    COMMAND
-      ${AVR_OBJCOPY} -j .eeprom --set-section-flags=.eeprom=alloc,load
-        --change-section-lma .eeprom=0 --no-change-warnings
-        -O ihex ${elf_file} ${eeprom_image}
-    DEPENDS ${elf_file}
+    PROPERTIES
+      OUTPUT_NAME "${elf_file}"
   )
 
   add_custom_target(
@@ -220,16 +219,13 @@ function(add_avr_executable EXECUTABLE_NAME)
 
   add_custom_target(
     ${EXECUTABLE_NAME}-disassemble
-    ${AVR_OBJDUMP} -h -S ${elf_file} > ${EXECUTABLE_NAME}.lst
+    ${AVR_OBJDUMP} -h -S ${elf_file} > ${lst_file}.disa
     DEPENDS ${elf_file}
   )
 
   # clean
   get_directory_property(clean_files ADDITIONAL_MAKE_CLEAN_FILES)
-  set_directory_properties(
-    PROPERTIES
-    ADDITIONAL_MAKE_CLEAN_FILES "${map_file}"
-  )
+  set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${map_file}")
 
 endfunction (add_avr_executable)
 
