@@ -15,7 +15,7 @@ function(setup_mega)
   set(AVR_MCU atmega2560 PARENT_SCOPE)
   set(AVR_L_FUSE 0xFF PARENT_SCOPE)
   set(AVR_H_FUSE 0xD8 PARENT_SCOPE)
-  set(AVR_E_FUSE 0xFD PARENT_SCOPE)
+  set(AVR_E_FUSE 0xFF PARENT_SCOPE)
 endfunction()
 
 function(setup_uno)
@@ -132,6 +132,7 @@ function (build_exe)
     message(STATUS "No sources to build: ${TARGET}")
   endif ()
 
+  avr_generate_fixed_targets()
 endfunction ()
 
 # } Build executable 

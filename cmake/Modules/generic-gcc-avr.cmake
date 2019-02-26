@@ -73,11 +73,11 @@ function (setup_gcc_avr_defaults)
   endif ()
 
   if (NOT AVR_UPLOADTOOL_PORT)
-    set(AVR_UPLOADTOOL_PORT usbtiny PARENT_SCOPE)
+    set(AVR_UPLOADTOOL_PORT usb PARENT_SCOPE)
   endif ()
 
   if (NOT AVR_PROGRAMMER)
-    set(AVR_PROGRAMMER wiring)
+    set(AVR_PROGRAMMER usbtiny)
     set(AVR_PROGRAMMER ${AVR_PROGRAMMER} PARENT_SCOPE)
   endif ()
 
