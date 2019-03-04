@@ -34,9 +34,8 @@ if (DOXYGEN_FOUND)
     endif ()
 
     set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${DOXYGEN_OUTPUT_PATH}/html")
-
     configure_file(${DOXYGEN_CONF_IN} ${DOXYGEN_CONF_OUT} @ONLY)
-    add_custom_target(docs COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_CONF_OUT})
+    add_custom_target(docs ALL COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_CONF_OUT})
   endif ()
 else ()
   message(WARNING "Doxygen not found. Documentation target not created.")
