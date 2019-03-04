@@ -1,4 +1,4 @@
-# Introduction
+# Overview
 
 The repository contains Cmake modules and example files which help to save time when
 setting up new C/C++ projects. The main goal is to reuse working solutions to common

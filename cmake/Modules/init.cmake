@@ -61,6 +61,8 @@ endif ()
 message(STATUS "ROOT_SOURCE_DIR: ${ROOT_SOURCE_DIR}")
 set(MAIN_SRC ${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}/main.cpp)
 
+include(doxygen)
+
 ####################################################################################################
 # Print all variables {
 
