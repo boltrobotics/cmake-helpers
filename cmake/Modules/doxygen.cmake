@@ -50,6 +50,10 @@ function (build_doc)
         set(DOXYGEN_WARN YES)
       endif ()
 
+      if (NOT DEFINED DOXYGEN_PREPROCESSING)
+        set(DOXYGEN_PREPROCESSING YES)
+      endif ()
+
       set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${DOXYGEN_OUTPUT_PATH}/html")
       configure_file(${DOXYGEN_CONF_IN} ${DOXYGEN_CONF_OUT} @ONLY)
 
