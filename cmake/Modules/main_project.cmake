@@ -93,3 +93,11 @@ elseif (BTR_X86 GREATER 0)
 endif ()
 
 # } stm32, avr, ard, x86
+
+
+####################################################################################################
+# documentation {
+
+include(doxygen)
+
+# } documentation

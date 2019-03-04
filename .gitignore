@@ -1,6 +1,7 @@
 # Logs, temp files and databases
 screenlog.*
 build-*/
+*/doc/html
 log/
 tmp/
 *.ct2
