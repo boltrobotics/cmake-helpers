@@ -12,12 +12,9 @@ function (setup)
     "${gtest_INC_DIR}"
   )
 
-  add_definitions(-DBTR_X86=${BTR_X86})
+  add_definitions(-DBTR_X86=1)
   add_compile_options(-Wall -Wextra -Werror)
 endfunction()
-
-# Call setup as a default step for now.
-setup()
 
 # } Standard setup
 
