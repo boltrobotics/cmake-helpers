@@ -9,8 +9,21 @@ include(init)
 ####################################################################################################
 # Standard set up {
 
+# WARNING: Usually, AVR library's CMakeLists.txt should not specify MCU, MCU_SPEED and PORT. The
+# variables should be defined by the executable that links in the library.
+
 function (setup_avr)
   cmake_parse_arguments(p "" "MCU;MCU_SPEED;PORT" "" ${ARGN})
+
+  if (NOT p_MCU)
+    if (NOT AVR_MCU)
+      set(AVR_MCU atmega328p)
+      message(STATUS "${BoldYellow}AVR_MCU default: ${AVR_MCU}${ColourReset}")
+    endif ()
+  else ()
+    set(AVR_MCU ${p_MCU})
+  endif ()
+  set(AVR_MCU ${AVR_MCU} PARENT_SCOPE)
 
   # See: $ENV{ARDUINOCOREAVR_HOME}/boards.txt
   if (p_MCU MATCHES atmega168)
@@ -29,19 +42,16 @@ function (setup_avr)
     set(AVR_L_FUSE 0xFF)
     set(AVR_H_FUSE 0xD8)
     set(AVR_E_FUSE 0xFF)
-  else ()
-    message(FATAL_ERROR "MCU undefined")
   endif ()
   set(AVR_L_FUSE ${AVR_L_FUSE} PARENT_SCOPE)
   set(AVR_H_FUSE ${AVR_H_FUSE} PARENT_SCOPE)
   set(AVR_E_FUSE ${AVR_E_FUSE} PARENT_SCOPE)
-  set(AVR_MCU ${p_MCU})
-  set(AVR_MCU ${AVRMCU} PARENT_SCOPE)
 
   if (p_MCU_SPEED)
     set(MCU_SPEED ${p_MCU_SPEED})
   else ()
     set(MCU_SPEED "16000000UL")
+    message(STATUS "${BoldYellow}MCU_SPEED default: ${MCU_SPEED}${ColourReset}")
   endif ()
   set(MCU_SPEED ${MCU_SPEED} PARENT_SCOPE)
 
@@ -56,10 +66,10 @@ function (setup_avr)
     message(FATAL_ERROR "AVRTOOLS_ROOT undefined")
   endif ()
 
-  message(STATUS "${BoldYellow}MCU: ${AVR_MCU}")
-  message(STATUS "SPEED: ${MCU_SPEED}")
+  message(STATUS "AVR_MCU: ${AVR_MCU}")
+  message(STATUS "MCU_SPEED: ${MCU_SPEED}")
   message(STATUS "FUSES (l:h:e): ${AVR_L_FUSE}:${AVR_H_FUSE}:${AVR_E_FUSE}")
-  message(STATUS "PORT: ${AVR_UPLOADTOOL_PORT}${ColourReset}")
+  message(STATUS "PORT: ${AVR_UPLOADTOOL_PORT}")
 
   set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY PARENT_SCOPE)
   set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY PARENT_SCOPE)

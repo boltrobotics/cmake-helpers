@@ -7,7 +7,7 @@ endif ()
 ####################################################################################################
 # Standard set up {
 
-function (setup)
+function (setup_x86)
   include_directories(
     "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"
     "${ROOT_SOURCE_DIR}/src/common"
@@ -18,9 +18,6 @@ function (setup)
   add_definitions(-DBTR_X86=${BTR_X86})
   add_compile_options(-Wall -Wextra -Werror)
 endfunction()
-
-# Call setup as a default step for now.
-setup()
 
 # } Standard setup
 
