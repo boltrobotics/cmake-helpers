@@ -3,7 +3,7 @@ include(gtest)
 ####################################################################################################
 # Standard set up {
 
-function (setup)
+function (setup_tests)
   include_directories(
     "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"
     "${ROOT_SOURCE_DIR}/src/common"
@@ -21,7 +21,7 @@ endfunction()
 ####################################################################################################
 # Build executable {
 
-function (build_exe)
+function (build_tests)
   cmake_parse_arguments(p "" "SUFFIX" "OBJS;SRCS;LIBS" ${ARGN})
 
   set(TARGET ${PROJECT_NAME}${p_SUFFIX})

@@ -13,7 +13,7 @@ endif ()
 ####################################################################################################
 # Standard set up {
 
-function (setup)
+function (setup_stm32)
   include_directories(
     "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"
     "${ROOT_SOURCE_DIR}/src/common"
@@ -24,9 +24,6 @@ function (setup)
   add_definitions(-DBTR_STM32=${BTR_STM32})
   add_definitions(-DSTM32${STM32_FAMILY})
 endfunction()
-
-# Call setup as a default step for now.
-setup()
 
 # } Standard setup
 

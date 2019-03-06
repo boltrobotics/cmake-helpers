@@ -1,5 +1,5 @@
 include(test_project)
 
-setup()
+setup_tests()
 find_test_srcs()
-build_exe(SRCS ${SOURCES} LIBS ${PROJECT_NAME} SUFFIX "-tests")
+build_tests(SRCS ${SOURCES} LIBS ${PROJECT_NAME} SUFFIX "-tests")

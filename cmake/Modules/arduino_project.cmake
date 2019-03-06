@@ -17,7 +17,7 @@ endif ()
 ####################################################################################################
 # Standard set up {
 
-function (setup)
+function (setup_arduino)
   include_directories(
     "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"
     "${ROOT_SOURCE_DIR}/src/common"
