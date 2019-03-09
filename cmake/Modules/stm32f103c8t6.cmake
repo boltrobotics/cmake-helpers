@@ -19,7 +19,14 @@ set(CMAKE_CXX_FLAGS_DEBUG "")
 set(CMAKE_C_FLAGS_RELEASE "")
 set(CMAKE_CXX_FLAGS_RELEASE "")
 
-set(O_FLAGS "-Os -g")
+if (CMAKE_BUILD_TYPE MATCHES Release)
+  set(O_FLAGS "-Os")
+endif ()
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+  # WARNING: Do NOT change optimization level to -00, the board will stuck in hard fault handler
+  set(O_FLAGS "-Os -g")
+endif ()
+
 set(M_FLAGS "-mthumb -mcpu=cortex-m3 -mabi=aapcs -msoft-float -mfix-cortex-m3-ldrd -MD")
 set(F_FLAGS "-fno-builtin -ffunction-sections -fdata-sections -fno-common -fomit-frame-pointer")
 set(F_FLAGS "${F_FLAGS} -fno-unroll-loops -ffast-math -ftree-vectorize -fno-exceptions")
