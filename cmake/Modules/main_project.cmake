@@ -42,13 +42,10 @@ if (BTR_STM32 GREATER 0)
   set(STM32_FLASH_SIZE $ENV{STM32_FLASH_SIZE})
   set(STM32_RAM_SIZE $ENV{STM32_RAM_SIZE})
 
-  add_target_config_args(
-    -DBTR_STM32=${BTR_STM32}
-    -DTOOLCHAIN_PREFIX=/usr/local
-    -DSTM32_CHIP=${STM32_CHIP}
-    -DSTM32_LINKER_SCRIPT=${STM32_CHIP}.ld
-    -DSTM32_FLASH_SIZE=${STM32_FLASH_SIZE}
-    -DSTM32_RAM_SIZE=${STM32_RAM_SIZE})
+  include(stm32_project)
+  setup_stm32()
+
+  add_target_config_args(-DBTR_STM32=${BTR_STM32} -DTOOLCHAIN_PREFIX=/usr/local)
   add_target_build(${BIN_DIR} ${PROJECT_NAME})
   add_target_flash(${BIN_DIR} ${PROJECT_NAME} ${OUTPUT_PATH} ADDR 0x08000000
     FLASH_SIZE ${STM32_FLASH_SIZE})
@@ -66,17 +63,8 @@ elseif (BTR_ARD GREATER 0)
 
   set(TOOLCHAIN_FILE $ENV{ARDUINOCMAKE_HOME}/cmake/ArduinoToolchain.cmake)
   set(BIN_DIR ${PROJECT_BINARY_DIR}/src/${BOARD_FAMILY})
-  set(BOARD $ENV{BOARD})
-  set(BOARD_CPU $ENV{BOARD_CPU})
-  set(BOARD_PORT $ENV{BOARD_PORT})
-  set(PRINT_BOARDS $ENV{PRINT_BOARDS})
 
-  add_target_config_args(
-    -DBTR_ARD=${BTR_ARD}
-    -DBOARD=${BOARD}
-    -DBOARD_CPU=${BOARD_CPU}
-    -DBOARD_PORT=${BOARD_PORT}
-    -DPRINT_BOARDS=${PRINT_BOARDS})
+  add_target_config_args(-DBTR_ARD=${BTR_ARD})
   add_target_build(${BIN_DIR} ${PROJECT_NAME})
   add_target_flash(${BIN_DIR} ${PROJECT_NAME} ${OUTPUT_PATH})
 

@@ -14,6 +14,52 @@ endif ()
 # Standard set up {
 
 function (setup_stm32)
+  cmake_parse_arguments(p "" "STM32_CHIP;STM32_LINKER_SCRIPT;STM32_FLASH_SIZE;STM32_RAM_SIZE" "" ${ARGN})
+
+  # Set chip
+  if (NOT p_STM32_CHIP)
+    if (NOT STM32_CHIP)
+      set(STM32_CHIP stm32f103c8t6)
+      message(STATUS "${BoldYellow}STM32_CHIP default: ${STM32_CHIP}${ColourReset}")
+    endif ()
+  else ()
+    set(STM32_CHIP ${p_STM32_CHIP})
+  endif ()
+  set(STM32_CHIP ${STM32_CHIP} PARENT_SCOPE)
+
+  # Set linker script
+  if (NOT p_STM32_LINKER_SCRIPT)
+    if (NOT STM32_LINKER_SCRIPT)
+      set(STM32_LINKER_SCRIPT "${STM32_CHIP}.ld")
+      message(STATUS "${BoldYellow}STM32_LINKER_SCRIPT default: ${STM32_LINKER_SCRIPT}${ColourReset}")
+    endif ()
+  else ()
+    set(STM32_LINKER_SCRIPT ${p_STM32_LINKER_SCRIPT})
+  endif ()
+  set(STM32_LINKER_SCRIPT ${STM32_LINKER_SCRIPT} PARENT_SCOPE)
+
+  # Set flash size
+  if (NOT p_STM32_FLASH_SIZE)
+    if (NOT STM32_FLASH_SIZE)
+      set(STM32_FLASH_SIZE 64K)
+      message(STATUS "${BoldYellow}STM32_FLASH_SIZE default: ${STM32_FLASH_SIZE}${ColourReset}")
+    endif ()
+  else ()
+    set(STM32_FLASH_SIZE ${p_STM32_FLASH_SIZE})
+  endif ()
+  set(STM32_FLASH_SIZE ${STM32_FLASH_SIZE} PARENT_SCOPE)
+
+  # Set ram size
+  if (NOT p_STM32_RAM_SIZE)
+    if (NOT STM32_RAM_SIZE)
+      set(STM32_RAM_SIZE 20K)
+      message(STATUS "${BoldYellow}STM32_RAM_SIZE default: ${STM32_RAM_SIZE}${ColourReset}")
+    endif ()
+  else ()
+    set(STM32_RAM_SIZE ${p_STM32_RAM_SIZE})
+  endif ()
+  set(STM32_RAM_SIZE ${STM32_RAM_SIZE} PARENT_SCOPE)
+
   include_directories(
     "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"
     "${ROOT_SOURCE_DIR}/src/common"
@@ -53,7 +99,8 @@ function (build_lib)
     target_link_libraries(${TARGET} ${p_LIBS})
     STM32_SET_TARGET_PROPERTIES(${TARGET})
   else ()
-    message(STATUS "No sources to build: ${TARGET}")
+    message(STATUS "${BoldYellow}No sources to build: ${TARGET}${ColourReset}")
+    add_custom_target(${TARGET})
   endif ()
 endfunction ()
 
@@ -91,7 +138,8 @@ function (build_exe)
     add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND ${CMAKE_COMMAND} --build .
       --target ${TARGET}.hex)
   else ()
-    message(STATUS "No sources to build: ${TARGET}")
+    message(STATUS "${BoldYellow}No sources to build: ${TARGET}${ColourReset}")
+    add_custom_target(${TARGET})
   endif ()
 
 endfunction ()

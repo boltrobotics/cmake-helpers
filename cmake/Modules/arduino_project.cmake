@@ -18,6 +18,18 @@ endif ()
 # Standard set up {
 
 function (setup_arduino)
+  cmake_parse_arguments(p "" "BOARD;PORT" "" ${ARGN})
+
+  if (NOT p_BOARD)
+    if (NOT BOARD)
+      set(BOARD uno)
+      message(STATUS "${BoldYellow}BOARD default: ${BOARD}${ColourReset}")
+    endif ()
+  else ()
+    set(BOARD ${p_BOARD})
+  endif ()
+  set(BOARD ${BOARD} PARENT_SCOPE)
+
   include_directories(
     "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"
     "${ROOT_SOURCE_DIR}/src/common"
@@ -47,12 +59,13 @@ function (build_lib)
     generate_arduino_library(
       ${TARGET}
       BOARD ${BOARD}
-      BOARD_CPU ${BOARD_CPU}
+      #BOARD_CPU ${BOARD_CPU}
       SRCS ${p_SRCS}
       LIBS ${p_LIBS}
     )
   else ()
-    message(STATUS "No sources to build: ${TARGET}")
+    message(STATUS "${BoldYellow}No sources to build: ${TARGET}${ColourReset}")
+    add_custom_target(${TARGET})
   endif ()
 
 endfunction ()
@@ -72,14 +85,15 @@ function (build_exe)
     generate_arduino_firmware(
       ${TARGET}
       BOARD ${BOARD}
-      BOARD_CPU ${BOARD_CPU}
+      #BOARD_CPU ${BOARD_CPU}
       PORT ${BOARD_PORT}
       SRCS ${p_SRCS}
       LIBS ${p_LIBS}
       AFLAGS -v
     )
   else ()
-    message(STATUS "No sources to build: ${TARGET}")
+    message(STATUS "${BoldYellow}No sources to build: ${TARGET}${ColourReset}")
+    add_custom_target(${TARGET})
   endif ()
 
 endfunction ()

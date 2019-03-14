@@ -1,4 +1,4 @@
-option(ENABLE_TESTS "Build unit tests" OFF)
+option(ENABLE_TESTS "Build unit tests" ON)
 
 if (BTR_X86 GREATER 0)
   if (ENABLE_TESTS)

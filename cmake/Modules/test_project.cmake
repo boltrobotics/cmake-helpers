@@ -42,7 +42,8 @@ function (build_tests)
     add_test(NAME ${TARGET} COMMAND $<TARGET_FILE:${TARGET}>)
 
   else ()
-    message(STATUS "No sources to build: ${TARGET}")
+    message(STATUS "${BoldYellow}No sources to build: ${TARGET}${ColourReset}")
+    add_custom_target(${TARGET})
   endif ()
 
 endfunction ()
