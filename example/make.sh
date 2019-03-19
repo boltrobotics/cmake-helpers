@@ -19,22 +19,22 @@ DEPS=0
 
 help()
 {
-  echo -e "Usage: `basename $0` [-x] [-s] [-r] [-a] [-d] [-h]"
+  echo -e "Usage: `basename $0` [-x] [-s] [-a] [-r] [-d] [-h]"
   echo -e "  -x - build x86"
   echo -e "  -s - build stm32"
-  echo -e "  -r - build avr"
-  echo -e "  -a - build arduino"
+  echo -e "  -a - build avr"
+  echo -e "  -r - build arduino"
   echo -e "  -d - pull dependencies"
   echo -e "  -h - this help"
 }
 
-while getopts "xsradh" Option
+while getopts "xsardh" Option
 do
   case $Option in
     x) X86=1;;
     s) STM32=1;;
-    r) AVR=1;;
-    a) ARD=1;;
+    a) AVR=1;;
+    r) ARD=1;;
     d) DEPS=1;;
     h) help; exit 0;;
     \?) help; exit 22;;
