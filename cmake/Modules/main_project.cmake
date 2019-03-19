@@ -36,6 +36,7 @@ endif ()
 
 if (BTR_STM32 GREATER 0)
 
+  set(TOOLCHAIN_PREFIX $ENV{ARMTOOLS_ROOT})
   set(TOOLCHAIN_FILE $ENV{STM32CMAKE_HOME}/cmake/gcc_stm32.cmake)
   set(BIN_DIR ${PROJECT_BINARY_DIR}/src/${BOARD_FAMILY})
   set(STM32_CHIP $ENV{STM32_CHIP})
@@ -45,7 +46,7 @@ if (BTR_STM32 GREATER 0)
   include(stm32_project)
   setup_stm32()
 
-  add_target_config_args(-DBTR_STM32=${BTR_STM32} -DTOOLCHAIN_PREFIX=/usr/local)
+  add_target_config_args(-DBTR_STM32=${BTR_STM32} -DTOOLCHAIN_PREFIX=${TOOLCHAIN_PREFIX})
   add_target_build(${BIN_DIR} ${PROJECT_NAME})
   add_target_flash(${BIN_DIR} ${PROJECT_NAME} ${OUTPUT_PATH} ADDR 0x08000000
     FLASH_SIZE ${STM32_FLASH_SIZE})
