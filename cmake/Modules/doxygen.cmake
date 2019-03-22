@@ -54,6 +54,10 @@ function (build_doc)
         set(DOXYGEN_PREPROCESSING YES)
       endif ()
 
+      if (NOT DEFINED DOXYGEN_EXCLUDE_EXTRA)
+        set(DOXYGEN_EXCLUDE_EXTRA "")
+      endif ()
+
       set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${DOXYGEN_OUTPUT_PATH}/html")
       configure_file(${DOXYGEN_CONF_IN} ${DOXYGEN_CONF_OUT} @ONLY)
 
