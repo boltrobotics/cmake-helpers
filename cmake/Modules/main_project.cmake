@@ -76,3 +76,5 @@ elseif (BTR_X86 GREATER 0)
 endif ()
 
 # } stm32, avr, ard, x86
+
+add_test_subdirectory()
