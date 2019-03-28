@@ -122,3 +122,5 @@ set(FREERTOS_SOURCES
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(FreeRTOS REQUIRED_VARS FREERTOS_INC_DIRS FREERTOS_SOURCES)
+
+include_directories(${FREERTOS_INC_DIRS})

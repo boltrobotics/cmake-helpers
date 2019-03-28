@@ -1,8 +1,8 @@
 include(project_setup)
 
 set(LIBOPENCM3_HOME $ENV{LIBOPENCM3_HOME})
-
 string(TOLOWER ${STM32_FAMILY} STM32_FAMILY_LOWER)
+
 add_project(
   PREFIX libopencm3
   HOME "${LIBOPENCM3_HOME}"
@@ -12,3 +12,5 @@ add_project(
   FORCE_UPDATE 0
   LIB_DIR "${LIBOPENCM3_HOME}/lib"
   LIB_NAME opencm3_stm32${STM32_FAMILY_LOWER})
+
+include_directories(${libopencm3_INC_DIR})

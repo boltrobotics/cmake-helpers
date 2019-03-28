@@ -1,10 +1,8 @@
-cmake_minimum_required(VERSION 3.7)
-
-if (NOT PROJECT_NAME)
-  message(WARNING "PROJECT_NAME undefined")
+if (SUBPROJECT_NAME)
+  project(${SUBPROJECT_NAME})
+else ()
+  project(${PROJECT_NAME})
 endif ()
-
-project(${PROJECT_NAME})
 
 include(init)
 include(firmware)
@@ -14,6 +12,12 @@ include(unit_testing)
 # stm32, avr, ard, x86 {
 
 function(add_target_config_args)
+  if (ENABLE_EXAMPLE)
+    set(ENABLE_EXAMPLE_D "-DENABLE_EXAMPLE=ON")
+  else ()
+    set(ENABLE_EXAMPLE_D "-DENABLE_EXAMPLE=OFF")
+  endif ()
+
   add_target_config(
     ${PROJECT_NAME}
     SRC_DIR ${PROJECT_SOURCE_DIR}/src/${BOARD_FAMILY}
@@ -25,6 +29,7 @@ function(add_target_config_args)
       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
       -DOUTPUT_PATH=${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}
       -DBOARD_FAMILY=${BOARD_FAMILY}
+      ${ENABLE_EXAMPLE_D}
       ${ARGN}
   )
 endfunction()

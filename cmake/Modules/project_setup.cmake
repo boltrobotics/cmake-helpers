@@ -122,15 +122,17 @@ function(add_project)
   set(${p_PREFIX}_LIB_NAME "${${p_PREFIX}_LIB_NAME}" PARENT_SCOPE)
   message(STATUS "${p_PREFIX} library name: ${${p_PREFIX}_LIB_NAME}")
 
-  # For cross-compiled (arm) project, cmake sets root filesystem at /usr/local/arm-non-eabi.
-  # Set the root to system root.
-  #set(CMAKE_FIND_ROOT_PATH /)
-  #find_library(
-  #  ${p_PREFIX}_LIB_PATH ${${p_PREFIX}_LIB_NAME} ${${p_PREFIX}_LIB_DIR})
-
   include(FindPackageHandleStandardArgs)
   find_package_handle_standard_args(${p_PREFIX} REQUIRED_VARS
     ${p_PREFIX}_LIB_DIR ${p_PREFIX}_INC_DIR)
+
+  # For cross-compiled (arm) project, cmake sets root filesystem at /usr/local/arm-non-eabi.
+  # Set the root to system root.
+  set(CMAKE_FIND_ROOT_PATH /)
+  find_library(
+    ${p_PREFIX}_LIB_PATH ${${p_PREFIX}_LIB_NAME} ${${p_PREFIX}_LIB_DIR})
+
+  #set(${p_PREFIX}_LIB_PATH "${${p_PREFIX}_LIB_DIR}/${${p_PREFIX}_LIB_NAME}" PARENT_SCOPE)
 
   if (NOT TARGET ${p_PREFIX})
     #if (NOT ${p_PREFIX}_${CMAKE_BUILD_TYPE}_ALREADY_ADDED)

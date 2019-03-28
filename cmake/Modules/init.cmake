@@ -123,3 +123,22 @@ function (find_test_srcs)
 endfunction ()
 
 # } Find test sources
+
+####################################################################################################
+# Set up library {
+
+function (setup_btr_lib NAME HOME ADD_LIB ADD_SUBDIR)
+  include_directories(${HOME}/include)
+
+  if (ADD_LIB)
+    set(BTR_LIBS ${LIBS} ${NAME} PARENT_SCOPE)
+  endif ()
+
+  if (ADD_SUBDIR AND NOT TARGET ${NAME})
+    set(ROOT_SOURCE_DIR ${HOME})
+    set(SUBPROJECT_NAME ${NAME})
+    add_subdirectory(${HOME}/src/${BOARD_FAMILY} ${PROJECT_BINARY_DIR}/${NAME})
+  endif ()
+endfunction()
+
+# } Set up library

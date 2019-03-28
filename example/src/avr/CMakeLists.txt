@@ -3,6 +3,8 @@ set(CMAKE_MODULE_PATH $ENV{CMAKEHELPERS_HOME}/cmake/Modules)
 
 include(avr_project)
 
-setup_avr(MCU atmega168 PORT "/dev/tty.usbmodemFD14511")
+set(AVR_MCU atmega168)
+set(AVR_UPLOADTOOL_PORT "/dev/tty.usbmodemFD14511")
+
 find_srcs()
 build_exe(SRCS ${SOURCES})
