@@ -1,8 +1,4 @@
-if (SUBPROJECT_NAME)
-  project(${SUBPROJECT_NAME})
-else ()
-  project(${PROJECT_NAME})
-endif ()
+include(init)
 
 ####################################################################################################
 # Standard set up {
@@ -17,7 +13,7 @@ function (setup_x86)
 
   add_definitions(-DBTR_X86=${BTR_X86})
   add_compile_options(-Wall -Wextra -Werror)
-endfunction()
+endfunction ()
 
 # } Standard setup
 
@@ -55,7 +51,7 @@ function (build_lib)
     target_link_libraries(${TARGET} PRIVATE ${p_LIBS})
 
   else ()
-    message(STATUS "${BoldYellow}No sources to build: ${TARGET}${ColourReset}")
+    message(STATUS "${Yellow}No sources to build${ColourReset}")
     add_custom_target(${TARGET})
   endif ()
 
@@ -83,7 +79,7 @@ function (build_exe)
     endif ()
     target_link_libraries(${TARGET} ${p_LIBS})
   else ()
-    message(STATUS "${BoldYellow}No sources to build: ${TARGET}${ColourReset}")
+    message(STATUS "${Yellow}No sources to build${ColourReset}")
     add_custom_target(${TARGET})
   endif ()
 

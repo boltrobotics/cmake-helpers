@@ -1,10 +1,7 @@
-if (SUBPROJECT_NAME)
-  project(${SUBPROJECT_NAME})
-else ()
-  project(${PROJECT_NAME})
-endif ()
-
 include(init)
+
+####################################################################################################
+# Standard set up {
 
 macro (setup_fuses LF HF EF)
   if (NOT AVR_L_FUSE)
@@ -21,12 +18,10 @@ macro (setup_fuses LF HF EF)
   endif ()
 endmacro ()
 
-####################################################################################################
-# Standard set up {
-
-# WARNING: Usually, AVR library's CMakeLists.txt should not specify MCU, MCU_SPEED and PORT. The
-# variables should be defined by the executable that links in the library.
-
+# IMPORTANT: When building executable, CMakeLists.txt of an AVR library that the executable links
+# in is not expected to specify AVR_MCU, MCU_SPEED and AVR_UPLOADTOOL_PORT. The variables should be
+# defined by the executable. If only building a library, define those variables.
+#
 function (setup_avr)
   if (NOT AVR_MCU)
     set(AVR_MCU atmega328p)
@@ -40,6 +35,11 @@ function (setup_avr)
 
   if (NOT AVR_UPLOADTOOL_PORT)
     message(FATAL_ERROR "AVR_UPLOADTOOL_PORT undefined")
+  endif ()
+
+  if (NOT AVR_PROGRAMMER)
+    set(AVR_PROGRAMMER wiring)
+    set(AVR_PROGRAMMER ${AVR_PROGRAMMER} PARENT_SCOPE)
   endif ()
 
   if (DEFINED ENV{AVRTOOLS_ROOT})
@@ -113,7 +113,7 @@ function (build_lib)
       avr_target_link_libraries(${TARGET} ${p_LIBS})
     endif ()
   else ()
-    message(STATUS "No sources to build: ${TARGET}")
+    message(STATUS "${Yellow}No sources to build${ColourReset}")
     add_custom_target(${TARGET})
   endif ()
 
@@ -144,7 +144,7 @@ function (build_exe)
       avr_target_link_libraries(${TARGET} ${p_LIBS})
     endif ()
   else ()
-    message(STATUS "${BoldYellow}No sources to build: ${TARGET}${ColourReset}")
+    message(STATUS "${Yellow}No sources to build${ColourReset}")
     add_custom_target(${TARGET})
   endif ()
 

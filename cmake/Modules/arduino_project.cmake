@@ -1,9 +1,3 @@
-if (SUBPROJECT_NAME)
-  project(${SUBPROJECT_NAME})
-else ()
-  project(${PROJECT_NAME})
-endif ()
-
 include(init)
 
 if (PRINT_BOARDS)
@@ -18,15 +12,8 @@ endif ()
 # Standard set up {
 
 function (setup_arduino)
-  cmake_parse_arguments(p "" "BOARD;PORT" "" ${ARGN})
-
-  if (NOT p_BOARD)
-    if (NOT BOARD)
-      set(BOARD uno)
-      message(STATUS "${BoldYellow}BOARD default: ${BOARD}${ColourReset}")
-    endif ()
-  else ()
-    set(BOARD ${p_BOARD})
+  if (NOT BOARD)
+    set(BOARD uno)
   endif ()
   set(BOARD ${BOARD} PARENT_SCOPE)
 
@@ -64,7 +51,7 @@ function (build_lib)
       LIBS ${p_LIBS}
     )
   else ()
-    message(STATUS "${BoldYellow}No sources to build: ${TARGET}${ColourReset}")
+    message(STATUS "${Yellow}No sources to build${ColourReset}")
     add_custom_target(${TARGET})
   endif ()
 
@@ -92,7 +79,7 @@ function (build_exe)
       AFLAGS -v
     )
   else ()
-    message(STATUS "${BoldYellow}No sources to build: ${TARGET}${ColourReset}")
+    message(STATUS "${Yellow}No sources to build${ColourReset}")
     add_custom_target(${TARGET})
   endif ()
 

@@ -18,6 +18,18 @@ if (NOT WIN32)
   set(BoldWhite   "${Esc}[1;37m")
 endif()
 
+if (SUBPROJECT_NAME)
+  project(${SUBPROJECT_NAME})
+else ()
+  project(${PROJECT_NAME})
+endif ()
+
+message(STATUS "${Green}Init: ${PROJECT_NAME}${ColourReset}")
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  set(CMAKE_MACOSX_RPATH 1)
+endif()
+
 if (BTR_X86 GREATER 0)
   set(BOARD_FAMILY x86)
 elseif (BTR_STM32 GREATER 0)
@@ -31,35 +43,29 @@ else ()
   set(BOARD_FAMILY x86)
 endif ()
 
-if (NOT CMAKE_RULE_MESSAGES)
-  message(STATUS "Setting default CMAKE_RULE_MESSAGES to OFF")
-  set(CMAKE_RULE_MESSAGES OFF)
-endif ()
-
-if (NOT CMAKE_VERBOSE_MAKEFILE)
-  message(STATUS "Setting default CMAKE_VERBOSE_MAKEFILE to ON")
-  set(CMAKE_VERBOSE_MAKEFILE ON)
-endif ()
+# set(CMAKE_RULE_MESSAGES OFF)
+# set(CMAKE_VERBOSE_MAKEFILE ON)
 
 if (NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
-  message(STATUS "Setting default CMAKE_BUILD_TYPE to ${CMAKE_BUILD_TYPE}")
 endif ()
 
-if (NOT OUTPUT_PATH)
+if (NOT DEFINED OUTPUT_PATH)
   set(OUTPUT_PATH "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
+endif ()
+
+if (NOT DEFINED ROOT_SOURCE_DIR)
+  set(ROOT_SOURCE_DIR ${PROJECT_SOURCE_DIR})
 endif ()
 
 set(EXECUTABLE_OUTPUT_PATH "${OUTPUT_PATH}/bin")
 set(LIBRARY_OUTPUT_PATH "${OUTPUT_PATH}/lib")
 set(CMAKE_CXX_STANDARD 14)
-
-if (NOT ROOT_SOURCE_DIR)
-  set(ROOT_SOURCE_DIR ${PROJECT_SOURCE_DIR})
-endif ()
-
-message(STATUS "ROOT_SOURCE_DIR: ${ROOT_SOURCE_DIR}")
 set(MAIN_SRC ${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}/main.cpp)
+
+message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+message(STATUS "ROOT_SOURCE_DIR: ${ROOT_SOURCE_DIR}")
+message(STATUS "OUTPUT_PATH: ${OUTPUT_PATH}")
 
 include(doxygen)
 
@@ -125,20 +131,26 @@ endfunction ()
 # } Find test sources
 
 ####################################################################################################
-# Set up library {
+# Set up dependency {
 
-function (setup_btr_lib NAME HOME ADD_LIB ADD_SUBDIR)
-  include_directories(${HOME}/include)
+function (setup_dep NAME HOME)
+  cmake_parse_arguments(p "" "INC_DIR;SUB_DIR;LIB_NAME" "" ${ARGN})
 
-  if (ADD_LIB)
-    set(BTR_LIBS ${LIBS} ${NAME} PARENT_SCOPE)
+  if (p_INC_DIR)
+    include_directories(${HOME}/${p_INC_DIR})
+  else ()
+    include_directories(${HOME}/include)
   endif ()
 
-  if (ADD_SUBDIR AND NOT TARGET ${NAME})
+  if (p_LIB_NAME)
+    set(BTR_LIBS ${LIBS} ${p_LIB_NAME} PARENT_SCOPE)
+  endif ()
+
+  if (NOT TARGET ${NAME} AND p_SUB_DIR)
     set(ROOT_SOURCE_DIR ${HOME})
     set(SUBPROJECT_NAME ${NAME})
-    add_subdirectory(${HOME}/src/${BOARD_FAMILY} ${PROJECT_BINARY_DIR}/${NAME})
+    add_subdirectory(${HOME}/${p_SUB_DIR} ${PROJECT_BINARY_DIR}/${NAME})
   endif ()
 endfunction()
 
-# } Set up library
+# } Set up dependency
