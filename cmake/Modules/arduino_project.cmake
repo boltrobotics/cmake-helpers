@@ -14,11 +14,12 @@ endif ()
 function (setup_arduino)
   if (NOT BOARD)
     set(BOARD uno)
+    set(BOARD ${BOARD} PARENT_SCOPE)
   endif ()
-  set(BOARD ${BOARD} PARENT_SCOPE)
 
   include_directories(
     "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"
+    "${ROOT_SOURCE_DIR}/src/avr"
     "${ROOT_SOURCE_DIR}/src/common"
     "${ROOT_SOURCE_DIR}/include/${PROJECT_NAME}"
     "${ROOT_SOURCE_DIR}/include"
@@ -41,12 +42,12 @@ function (build_lib)
 
   if (SRCS_LEN GREATER 0)
     message(STATUS "Target: ${TARGET}. Sources: ${p_SRCS}. OBJS: ${p_OBJS}")
-    set(ignore_warning "${BOARD_PORT}")
+    set(ignore_warning "${PORT}")
 
     generate_arduino_library(
       ${TARGET}
       BOARD ${BOARD}
-      #BOARD_CPU ${BOARD_CPU}
+      BOARD_CPU ${BOARD_CPU}
       SRCS ${p_SRCS}
       LIBS ${p_LIBS}
     )
@@ -72,8 +73,8 @@ function (build_exe)
     generate_arduino_firmware(
       ${TARGET}
       BOARD ${BOARD}
-      #BOARD_CPU ${BOARD_CPU}
-      PORT ${BOARD_PORT}
+      BOARD_CPU ${BOARD_CPU}
+      PORT ${PORT}
       SRCS ${p_SRCS}
       LIBS ${p_LIBS}
       AFLAGS -v

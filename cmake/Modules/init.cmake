@@ -88,13 +88,15 @@ endfunction()
 # Find sources {
 
 function (find_srcs)
-  cmake_parse_arguments(p "" "" "FILTER" ${ARGN})
+  cmake_parse_arguments(p "" "" "FILTER;XTRA_PATHS" ${ARGN})
 
   file(GLOB_RECURSE SOURCES_SCAN
     "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}/*.c"
     "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}/*.cpp"
     "${ROOT_SOURCE_DIR}/src/common/*.c"
-    "${ROOT_SOURCE_DIR}/src/common/*.cpp")
+    "${ROOT_SOURCE_DIR}/src/common/*.cpp"
+    "${p_XTRA_PATHS}"
+    )
 
   list(LENGTH p_FILTER FILTER_LEN)
 
