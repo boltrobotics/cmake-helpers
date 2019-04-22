@@ -21,7 +21,7 @@ endfunction ()
 # Build library
 
 function (build_lib)
-  cmake_parse_arguments(p "" "SUFFIX;LIB_TYPE" "OBJS;SRCS;LIBS" ${ARGN})
+  cmake_parse_arguments(p "" "SUFFIX" "OBJS;SRCS;LIBS" ${ARGN})
 
   set(TARGET ${PROJECT_NAME}${p_SUFFIX})
   list(LENGTH p_OBJS OBJS_LEN)
@@ -33,11 +33,8 @@ function (build_lib)
     # Build object files
     add_library(${TARGET}_o OBJECT ${p_SRCS})
 
-    if (p_LIB_TYPE) 
-      string(COMPARE EQUAL ${p_LIB_TYPE} SHARED _cmp)
-      if (_cmp)
-        set_property(TARGET ${TARGET}_o PROPERTY POSITION_INDEPENDENT_CODE ON)
-      endif ()
+    if (LIB_TYPE MATCHES SHARED) 
+      set_property(TARGET ${TARGET}_o PROPERTY POSITION_INDEPENDENT_CODE ON)
     endif ()
 
     set(SOURCES_OBJ ${TARGET}_o PARENT_SCOPE)
