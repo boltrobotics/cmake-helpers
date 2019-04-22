@@ -33,7 +33,7 @@ Arm GNU Embedded Toolchain, FreeRTOS).
   * avr-gcc
   * <a href="https://www.nongnu.org/avrdude/" target="_blank">avrdude</a>
 * To build STM32F103 firmware
-  * <a href="https://developer.arm.com/open-source" target="_blank">Arm GNU Embedded Toolchain</a>
+  * <a href="https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm" target="_blank">Arm GNU Embedded Toolchain</a>
   * <a href="https://github.com/boltrobotics/stm32-cmake.git" target="_blank">stm32-cmake</a>
   * <a href="https://github.com/libopencm3/libopencm3.git" target="_blank">libopencm3</a>
   * <a href="https://www.freertos.org/" target="_blank">FreeRTOS</a>
