@@ -42,10 +42,10 @@ function (setup_avr)
     set(AVR_PROGRAMMER ${AVR_PROGRAMMER} PARENT_SCOPE)
   endif ()
 
-  if (DEFINED ENV{AVRTOOLS_ROOT})
-    set(CMAKE_FIND_ROOT_PATH $ENV{AVRTOOLS_ROOT} PARENT_SCOPE)
+  if (DEFINED ENV{AVRTOOLS_HOME})
+    set(CMAKE_FIND_ROOT_PATH $ENV{AVRTOOLS_HOME} PARENT_SCOPE)
   else ()
-    message(FATAL_ERROR "AVRTOOLS_ROOT undefined")
+    message(FATAL_ERROR "AVRTOOLS_HOME undefined")
   endif ()
 
   # For fuse settings see: $ENV{ARDUINOCOREAVR_HOME}/boards.txt
