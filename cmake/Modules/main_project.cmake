@@ -62,13 +62,16 @@ elseif (BTR_AVR GREATER 0)
   add_target_flash(${BIN_DIR} ${PROJECT_NAME} ${OUTPUT_PATH})
 
 elseif (BTR_ARD GREATER 0)
+  if (BTR_ARD_NON_OBSOLETE)
+    set(TOOLCHAIN_FILE $ENV{ARDUINOCMAKE_HOME}/cmake/ArduinoToolchain.cmake)
+    set(BIN_DIR ${PROJECT_BINARY_DIR}/src/${BOARD_FAMILY})
 
-  set(TOOLCHAIN_FILE $ENV{ARDUINOCMAKE_HOME}/cmake/ArduinoToolchain.cmake)
-  set(BIN_DIR ${PROJECT_BINARY_DIR}/src/${BOARD_FAMILY})
-
-  add_target_config_args(-DBTR_ARD=${BTR_ARD})
-  add_target_build(${BIN_DIR} ${PROJECT_NAME})
-  add_target_flash(${BIN_DIR} ${PROJECT_NAME} ${OUTPUT_PATH})
+    add_target_config_args(-DBTR_ARD=${BTR_ARD})
+    add_target_build(${BIN_DIR} ${PROJECT_NAME})
+    add_target_flash(${BIN_DIR} ${PROJECT_NAME} ${OUTPUT_PATH})
+  else ()
+    message(STATUS "${Yellow}Arduino build is obsolete${ColourReset}")
+  endif ()
 
 elseif (BTR_X86 GREATER 0)
 
