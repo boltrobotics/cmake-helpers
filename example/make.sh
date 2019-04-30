@@ -2,13 +2,13 @@
 
 help()
 {
-  echo -e "Usage: `basename $0` [-x] [-s] [-a] [-m _model_path_] [-t] [-d] [-p _projects_home_] [-h]"
+  echo -e "Usage: `basename $0` [-x] [-s] [-a] [-r] [-d] [-p _projects_home_] [-h]"
   echo -e "  -x - build x86"
   echo -e "  -s - build stm32"
   echo -e "  -a - build avr"
   echo -e "  -r - build arduino"
   echo -e "  -d - pull dependencies"
-  echo -e "  -p - projects home"
+  echo -e "  -p - absolute path to projects home"
   echo -e "  -h - this help"
 }
 
@@ -31,7 +31,7 @@ AVR=0
 ARD=0
 DEPS=0
 
-while getopts "xsardh" Option
+while getopts "xsardp:h" Option
 do
   case $Option in
     x) X86=1;;
@@ -51,7 +51,8 @@ shift $(($OPTIND - 1))
 # Dependency paths
 
 if [ -z ${PROJECTS_HOME} ]; then
-  PROJECTS_HOME="${PWD}"
+  # Assume the script is invoked from within its project.
+  PROJECTS_HOME="${PWD}/../.."
 fi
 if [ -z ${XTRA_HOME} ]; then
   XTRA_HOME=${PROJECTS_HOME}/xtra
@@ -97,28 +98,32 @@ if [ "${DEPS}" -eq 1 ]; then
 fi
 
 if [ ${X86} -eq 1 ]; then
-  (mkdir -p "build-x86" \
+  (cd ${CMAKEHELPERS_HOME}/example \
+    && mkdir -p "build-x86" \
     && cd "build-x86" \
     && cmake -DBTR_X86=1 "$@" .. \
     && make)
 fi
 
 if [ ${STM32} -eq 1 ]; then
-  (mkdir -p "build-stm32" \
+  (cd ${CMAKEHELPERS_HOME}/example \
+    && mkdir -p "build-stm32" \
     && cd "build-stm32" \
     && cmake -DBTR_STM32=1 "$@" .. \
     && make)
 fi
 
 if [ ${AVR} -eq 1 ]; then
-  (mkdir -p "build-avr" \
+  (cd ${CMAKEHELPERS_HOME}/example \
+    && mkdir -p "build-avr" \
     && cd "build-avr" \
     && cmake -DBTR_AVR=1 "$@" .. \
     && make)
 fi
 
 if [ ${ARD} -eq 1 ]; then
-  (mkdir -p "build-ard" \
+  (cd ${CMAKEHELPERS_HOME}/example \
+    && mkdir -p "build-ard" \
     && cd "build-ard" \
     && cmake -DBTR_ARD=1 "$@" .. \
     && make)
