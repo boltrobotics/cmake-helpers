@@ -6,6 +6,7 @@ string(TOLOWER ${STM32_FAMILY} STM32_FAMILY_LOWER)
 add_project(
   PREFIX libopencm3
   HOME "${LIBOPENCM3_HOME}"
+  SRC_DIR "${LIBOPENCM3_HOME}"
   URL "https://github.com/libopencm3/libopencm3.git"
   BUILD_CMD "make TARGETS=stm32/${STM32_FAMILY_LOWER}"
   BUILD_IN 1
