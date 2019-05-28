@@ -73,8 +73,9 @@ elseif (BTR_ARD GREATER 0)
     message(STATUS "${Yellow}Arduino build is obsolete${ColourReset}")
   endif ()
 
-elseif (BTR_X86 GREATER 0)
+else ()
 
+  set(BTR_X86 1)
   add_subdirectory("${PROJECT_SOURCE_DIR}/src/${BOARD_FAMILY}")
 
 endif ()

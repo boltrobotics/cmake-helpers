@@ -24,8 +24,6 @@ else ()
   project(${PROJECT_NAME})
 endif ()
 
-message(STATUS "${Green}Init: ${PROJECT_NAME}${ColourReset}")
-
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set(CMAKE_MACOSX_RPATH 1)
 endif()
@@ -63,6 +61,7 @@ set(LIBRARY_OUTPUT_PATH "${OUTPUT_PATH}/lib")
 set(CMAKE_CXX_STANDARD 14)
 set(MAIN_SRC ${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}/main.cpp)
 
+message(STATUS "${Green}Init: ${PROJECT_NAME}${ColourReset}")
 message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 message(STATUS "ROOT_SOURCE_DIR: ${ROOT_SOURCE_DIR}")
 message(STATUS "OUTPUT_PATH: ${OUTPUT_PATH}")
@@ -145,7 +144,7 @@ function (setup_dep NAME HOME)
   endif ()
 
   if (p_LIB_NAME)
-    set(BTR_LIBS ${LIBS} ${p_LIB_NAME} PARENT_SCOPE)
+    set(BTR_LIBS ${BTR_LIBS} ${p_LIB_NAME} PARENT_SCOPE)
   endif ()
 
   if (NOT TARGET ${NAME} AND p_SUB_DIR)
