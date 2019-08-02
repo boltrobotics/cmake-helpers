@@ -8,26 +8,6 @@ endif ()
 # Standard set up {
 
 function (setup_stm32)
-  if (NOT STM32_CHIP)
-    set(STM32_CHIP stm32f103c8t6)
-  endif ()
-  set(STM32_CHIP ${STM32_CHIP} PARENT_SCOPE)
-
-  if (NOT STM32_LINKER_SCRIPT)
-    set(STM32_LINKER_SCRIPT "${STM32_CHIP}.ld")
-  endif ()
-  set(STM32_LINKER_SCRIPT ${STM32_LINKER_SCRIPT} PARENT_SCOPE)
-
-  if (NOT STM32_FLASH_SIZE)
-    set(STM32_FLASH_SIZE 64K)
-  endif ()
-  set(STM32_FLASH_SIZE ${STM32_FLASH_SIZE} PARENT_SCOPE)
-
-  if (NOT STM32_RAM_SIZE)
-    set(STM32_RAM_SIZE 20K)
-  endif ()
-  set(STM32_RAM_SIZE ${STM32_RAM_SIZE} PARENT_SCOPE)
-
   include_directories(
     "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"
     "${ROOT_SOURCE_DIR}/src/common"

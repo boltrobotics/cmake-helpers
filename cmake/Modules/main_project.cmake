@@ -44,10 +44,28 @@ if (BTR_STM32 GREATER 0)
   set(STM32_FLASH_SIZE $ENV{STM32_FLASH_SIZE})
   set(STM32_RAM_SIZE $ENV{STM32_RAM_SIZE})
 
+  # TODO fail or set defaults?
+  if (NOT STM32_CHIP)
+    set(STM32_CHIP stm32f103c8t6)
+
+    if (NOT STM32_LINKER_SCRIPT)
+      set(STM32_LINKER_SCRIPT ${STM32_CHIP}.ld)
+    endif ()
+  endif ()
+  if (NOT STM32_FLASH_SIZE)
+    set(STM32_FLASH_SIZE 64K)
+  endif ()
+  if (NOT STM32_RAM_SIZE)
+    set(STM32_RAM_SIZE 20K)
+  endif ()
+
   include(stm32_project)
   setup_stm32()
 
-  add_target_config_args(-DBTR_STM32=${BTR_STM32} -DTOOLCHAIN_PREFIX=${TOOLCHAIN_PREFIX})
+  add_target_config_args(
+    -DBTR_STM32=${BTR_STM32} -DTOOLCHAIN_PREFIX=${TOOLCHAIN_PREFIX}
+    -DSTM32_CHIP=${STM32_CHIP} -DSTM32_LINKER_SCRIPT=${STM32_LINKER_SCRIPT}
+    -DSTM32_FLASH_SIZE=${STM32_FLASH_SIZE} -DSTM32_RAM_SIZE=${STM32_RAM_SIZE})
   add_target_build(${BIN_DIR} ${PROJECT_NAME})
   add_target_flash(${BIN_DIR} ${PROJECT_NAME} ${OUTPUT_PATH} ADDR 0x08000000
     FLASH_SIZE ${STM32_FLASH_SIZE})
