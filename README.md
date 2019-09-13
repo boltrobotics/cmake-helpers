@@ -63,7 +63,6 @@ Arm GNU Embedded Toolchain, FreeRTOS).
   * [libopencm3.cmake](#libopencm3.cmake)
   * [freertos.cmake](#freertos.cmake)
   * [stm32f103c8t6.cmake](#stm32f103c8t6.cmake)
-* [Contribute](#Contribute)
 
 # <a name="Example"></a>Example
 
@@ -563,8 +562,3 @@ Moreover, most features of stm32-cmake remain unused and may cause difficulty du
 A few functions that [stm32/CMakeLists.txt](#stm32_CMakeLists.txt) refers to do not justify
 keeping that dependency around. ```TODO``` reassess the benefit of using stm32-cmake given the
 circumstances.
-
-# <a name="Contribute" href="https://boltrobotics.com/contribute/" target="_blank">Contribute</a>
-
-Consider supporting our projects by contributing to their development.
-<a href="https://boltrobotics.com/contribute/" target="_blank">Learn more at boltrobotics.com</a>
