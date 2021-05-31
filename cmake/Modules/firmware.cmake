@@ -16,7 +16,7 @@ function(add_target_config BIN_NAME)
   endif()
 
   if (NOT p_TOOLCHAIN_FILE)
-    message(SEND_ERROR "add_target_config called without TOOLCHAIN_FILE.")
+    message(FATAL_ERROR "add_target_config called without TOOLCHAIN_FILE")
   endif()
 
   set(DTOOLCHAIN_FILE -DCMAKE_TOOLCHAIN_FILE=${p_TOOLCHAIN_FILE})
@@ -52,7 +52,6 @@ endfunction()
 function(add_target_flash BIN_DIR BIN_NAME OUT_DIR)
 
   if ((BTR_AVR GREATER 0) OR (BTR_ARD GREATER 0))
-
     add_custom_target(
       ${BIN_NAME}-flash
       WORKING_DIRECTORY ${BIN_DIR}
@@ -61,7 +60,6 @@ function(add_target_flash BIN_DIR BIN_NAME OUT_DIR)
     add_dependencies(${BIN_NAME}-flash ${BIN_NAME})
 
   elseif (BTR_STM32 GREATER 0)
-
     cmake_parse_arguments(p "" "ADDR;FLASH_SIZE" "" ${ARGN})
 
     if (p_FLASH_SIZE)

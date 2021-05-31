@@ -1,3 +1,5 @@
+message(STATUS "Processing: init.cmake. CMAKE_PROJECT_NAME: ${CMAKE_PROJECT_NAME}")
+
 if (NOT WIN32)
   string(ASCII 27 Esc)
   set(ColourReset "${Esc}[m")
@@ -61,7 +63,6 @@ set(LIBRARY_OUTPUT_PATH "${OUTPUT_PATH}/lib")
 set(CMAKE_CXX_STANDARD 14)
 set(MAIN_SRC ${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}/main.cpp)
 
-message(STATUS "${Green}Init: ${PROJECT_NAME}${ColourReset}")
 message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 message(STATUS "ROOT_SOURCE_DIR: ${ROOT_SOURCE_DIR}")
 message(STATUS "OUTPUT_PATH: ${OUTPUT_PATH}")

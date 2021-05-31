@@ -52,10 +52,10 @@ shift $(($OPTIND - 1))
 
 if [ -z ${PROJECTS_HOME} ]; then
   # Assume the script is invoked from within its project.
-  PROJECTS_HOME="${PWD}/../.."
+  export PROJECTS_HOME="${PWD}/../.."
 fi
 if [ -z ${XTRA_HOME} ]; then
-  XTRA_HOME=${PROJECTS_HOME}/xtra
+  export XTRA_HOME=${PROJECTS_HOME}/xtra
 fi
 
 # Bolt Robotics projects
@@ -80,9 +80,6 @@ if [ -z ${FREERTOS_HOME} ]; then
 fi
 if [ -z ${LIBOPENCM3_HOME} ]; then
   export LIBOPENCM3_HOME=${XTRA_HOME}/libopencm3
-fi
-if [ -z ${STM32CMAKE_HOME} ]; then
-  export STM32CMAKE_HOME=${XTRA_HOME}/stm32-cmake
 fi
 if [ -z ${ARDUINOCMAKE_HOME} ]; then
   export ARDUINOCMAKE_HOME=${XTRA_HOME}/arduino-cmake

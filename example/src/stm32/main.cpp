@@ -4,8 +4,8 @@
 // SYSTEM INCLUDES
 #include "FreeRTOS.h"
 #include "task.h"
-#include <libopencm3/stm32/rcc.h>
-#include <libopencm3/stm32/gpio.h>
+#include "libopencm3/stm32/rcc.h"
+#include "libopencm3/stm32/gpio.h"
 
 // PROJECT INCLUDES
 #include "example.hpp"
@@ -58,7 +58,7 @@ static void task1(void* args __attribute((unused)))
 
 int main()
 {
-  rcc_clock_setup_in_hse_8mhz_out_72mhz();
+  rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
 
   rcc_periph_clock_enable(clk);
   gpio_set_mode(port, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, pin);
