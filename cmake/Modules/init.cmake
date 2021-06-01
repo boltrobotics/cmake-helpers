@@ -30,17 +30,13 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set(CMAKE_MACOSX_RPATH 1)
 endif()
 
-if (BTR_X86 GREATER 0)
-  set(BOARD_FAMILY x86)
-elseif (BTR_STM32 GREATER 0)
+if (BTR_STM32 GREATER 0)
   set(BOARD_FAMILY stm32)
 elseif (BTR_AVR GREATER 0)
   set(BOARD_FAMILY avr)
-elseif (BTR_ARD GREATER 0)
-  set(BOARD_FAMILY ard)
 else ()
-  set(BTR_X86 1)
   set(BOARD_FAMILY x86)
+  set(BTR_X86 1)
 endif ()
 
 # set(CMAKE_RULE_MESSAGES OFF)
@@ -109,28 +105,6 @@ function (find_srcs)
 endfunction ()
 
 # } Find sources
-
-####################################################################################################
-# Find test sources {
-
-function (find_test_srcs)
-  cmake_parse_arguments(p "" "" "FILTER" ${ARGN})
-
-  file(GLOB_RECURSE SOURCES_SCAN
-    "${ROOT_SOURCE_DIR}/test/*.c"
-    "${ROOT_SOURCE_DIR}/test/*.cpp")
-
-  list(LENGTH p_FILTER FILTER_LEN)
-
-  if (FILTER_LEN GREATER 0)
-    message(STATUS  "Exclude test sources: ${p_FILTER}")
-    list(REMOVE_ITEM SOURCES_SCAN ${p_FILTER})
-  endif ()
-
-  set(SOURCES ${SOURCES_SCAN} PARENT_SCOPE)
-endfunction ()
-
-# } Find test sources
 
 ####################################################################################################
 # Set up dependency {

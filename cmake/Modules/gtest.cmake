@@ -3,8 +3,10 @@ include(project_setup)
 find_package(Boost REQUIRED COMPONENTS system thread)
 find_package(GTest)
 
-if (GTEST_FOUND)
-  include_directories(${GTEST_INCLUDE_DIRS})
+if (GTest_FOUND)
+  set(gtest_INC_DIR ${GTEST_INCLUDE_DIRS})
+  set(gtest_LIB_NAME ${GTEST_LIBRARIES})
+  message(STATUS "Using system gtest. Include dirs: ${gtest_INC_DIR}, lib name: ${gtest_LIB_NAME}")
 else ()
   set(GTEST_HOME $ENV{GTEST_HOME})
 
@@ -31,6 +33,7 @@ else ()
       ARCHIVE_OUTPUT_DIRECTORY "${OUTPUT_PATH}/lib"
       PDB_OUTPUT_DIRECTORY "${OUTPUT_PATH}/bin")
   endif ()
+
   if (TARGET gtest_main)
     set_target_properties(gtest_main
       PROPERTIES

@@ -1,15 +1,9 @@
 message(STATUS "Processing: main_project.cmake. CMAKE_PROJECT_NAME: ${CMAKE_PROJECT_NAME}")
 include(init)
 include(firmware)
-include(unit_testing)
-
-if (NOT IS_DIRECTORY "${PROJECT_SOURCE_DIR}/src/${BOARD_FAMILY}")
-  message(STATUS "No sources to build for ${BOARD_FAMILY}")
-  return()
-endif ()
 
 ####################################################################################################
-# stm32, avr, ard, x86 {
+# stm32, avr, x86 {
 
 function(add_target_config_args)
   if (ENABLE_EXAMPLE)
@@ -19,6 +13,7 @@ function(add_target_config_args)
     set(CMAKE_VERBOSE_MAKEFILE_D "-DCMAKE_VERBOSE_MAKEFILE=ON")
   endif()
 
+  # BOARD_FAMILY is set up in init.cmake
   add_target_config(
     ${PROJECT_NAME}
     SRC_DIR ${PROJECT_SOURCE_DIR}/src/${BOARD_FAMILY}
@@ -37,6 +32,10 @@ function(add_target_config_args)
 endfunction()
 
 if (BTR_STM32 GREATER 0)
+  if (NOT IS_DIRECTORY "${PROJECT_SOURCE_DIR}/src/${BOARD_FAMILY}")
+    message(STATUS "No sources to build for ${BOARD_FAMILY}")
+    return()
+  endif ()
 
   set(TOOLCHAIN_PREFIX $ENV{ARMTOOLS_HOME})
   set(TOOLCHAIN_FILE $ENV{CMAKEHELPERS_HOME}/cmake/Modules/gcc_stm32_toolchain.cmake)
@@ -76,6 +75,10 @@ if (BTR_STM32 GREATER 0)
     FLASH_SIZE ${STM32_FLASH_SIZE})
 
 elseif (BTR_AVR GREATER 0)
+  if (NOT IS_DIRECTORY "${PROJECT_SOURCE_DIR}/src/${BOARD_FAMILY}")
+    message(STATUS "No sources to build for ${BOARD_FAMILY}")
+    return()
+  endif ()
 
   set(TOOLCHAIN_FILE $ENV{CMAKEHELPERS_HOME}/cmake/Modules/gcc_avr_toolchain.cmake)
   set(BIN_DIR ${PROJECT_BINARY_DIR}/src/${BOARD_FAMILY})
@@ -84,25 +87,22 @@ elseif (BTR_AVR GREATER 0)
   add_target_build(${BIN_DIR} ${PROJECT_NAME})
   add_target_flash(${BIN_DIR} ${PROJECT_NAME} ${OUTPUT_PATH})
 
-elseif (BTR_ARD GREATER 0)
-  if (BTR_ARD_NON_OBSOLETE)
-    set(TOOLCHAIN_FILE $ENV{ARDUINOCMAKE_HOME}/cmake/ArduinoToolchain.cmake)
-    set(BIN_DIR ${PROJECT_BINARY_DIR}/src/${BOARD_FAMILY})
-
-    add_target_config_args(-DBTR_ARD=${BTR_ARD})
-    add_target_build(${BIN_DIR} ${PROJECT_NAME})
-    add_target_flash(${BIN_DIR} ${PROJECT_NAME} ${OUTPUT_PATH})
+else ()
+  if (NOT IS_DIRECTORY "${PROJECT_SOURCE_DIR}/src/${BOARD_FAMILY}")
+    message(STATUS "No sources to build for ${BOARD_FAMILY}")
   else ()
-    message(STATUS "${Yellow}Arduino build is obsolete${ColourReset}")
+    add_subdirectory("${PROJECT_SOURCE_DIR}/src/${BOARD_FAMILY}")
   endif ()
 
-else ()
-
-  set(BTR_X86 1)
-  add_subdirectory("${PROJECT_SOURCE_DIR}/src/${BOARD_FAMILY}")
+  if (ENABLE_TESTS)
+    if (EXISTS "${ROOT_SOURCE_DIR}/test")
+      enable_testing()
+      add_subdirectory(${ROOT_SOURCE_DIR}/test)
+    else ()
+      message(WARNING "Test directory doesn't exist: ${ROOT_SOURCE_DIR}/test")
+    endif ()
+  endif()
 
 endif ()
 
-# } stm32, avr, ard, x86
-
-add_test_subdirectory()
+# } stm32, avr, x86

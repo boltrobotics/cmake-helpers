@@ -1,7 +1,7 @@
 include(gtest)
 
 ####################################################################################################
-# Standard set up {
+# Standard set-up {
 
 function (setup_tests)
   include_directories(
@@ -16,7 +16,29 @@ function (setup_tests)
   add_compile_options(-Wall -Wextra -Werror)
 endfunction()
 
-# } Standard setup
+# } Standard set-up
+
+####################################################################################################
+# Find test sources {
+
+function (find_test_srcs)
+  cmake_parse_arguments(p "" "" "FILTER" ${ARGN})
+
+  file(GLOB_RECURSE SOURCES_SCAN
+    "${ROOT_SOURCE_DIR}/test/*.c"
+    "${ROOT_SOURCE_DIR}/test/*.cpp")
+
+  list(LENGTH p_FILTER FILTER_LEN)
+
+  if (FILTER_LEN GREATER 0)
+    message(STATUS  "Exclude test sources: ${p_FILTER}")
+    list(REMOVE_ITEM SOURCES_SCAN ${p_FILTER})
+  endif ()
+
+  set(SOURCES ${SOURCES_SCAN} PARENT_SCOPE)
+endfunction ()
+
+# } Find test sources
 
 ####################################################################################################
 # Build executable {
