@@ -13,7 +13,7 @@ problems such as:
 
 ### Platforms and requirements
 
-The [example](#Example) project was tested on MacOS and Linux. Depending on host and target
+The [example](#Example) project was tested on Linux. Depending on host and target
 platforms, not all the dependencies given below may apply.
 
 Most of the packages can be installed using system package manager. When a package manager
@@ -183,7 +183,7 @@ set(ROOT_SOURCE_DIR ${PROJECT_SOURCE_DIR})
 include(main_project)
 ```
 
-### <a name="main_project.cmake" href="main_project.cmake">main_project.cmake</a>
+### <a name="main_project.cmake" href="cmake/Modules/main_project.cmake">main_project.cmake</a>
 
 Instructions in the file start with a regular version/project preamble. Next, the file sets
 the path to modules and instructs to include [init.cmake](#init.cmake),
@@ -305,8 +305,7 @@ function (build_exe)
 ...
 ```
 
-### <a name="stm32_CMakeLists.txt"
-href="example/src/stm32/CMakeLists.txt">example/src/stm32/CMakeLists.txt</a>
+### <a name="stm32_CMakeLists.txt" href="example/src/stm32/CMakeLists.txt">example/src/stm32/CMakeLists.txt</a>
 
 This project file uses the same idea as described in [avr/CMakeLists.txt](#avr_CMakeLists.txt), but
 here more instructions need to be specified.
@@ -316,7 +315,7 @@ The firmware for stm32f103c8 uses
 Before the firmware can use it, libopencm3 must be built using ```make```. One option
 to achieve it is to download and build the library manually. Another is to use
 [project_setup.cmake](#project_setup.cmake) module which can automate the process a bit more. These
-instructions are specified in [libopencm3.cmake](#libopencm3).
+instructions are specified in [libopencm3.cmake](#libopencm3.cmake).
 
 Another library that the firmware depends on is
 <a href="https://www.freertos.org/" target="_blank">FreeRTOS</a>, which has its own usage
@@ -355,8 +354,7 @@ function (build_exe)
 ...
 ```
 
-### <a name="x86_CMakeLists.txt"
-  href="example/src/x86/CMakeLists.txt">example/src/x86/CMakeLists.txt</a>
+### <a name="x86_CMakeLists.txt" href="example/src/x86/CMakeLists.txt">example/src/x86/CMakeLists.txt</a>
 
 The file instructs to build a library, and/or an executable for x84 platform:
 
@@ -374,8 +372,7 @@ build_exe(OBJS "${SOURCES_OBJ}" SRCS "${MAIN_SRC}" LIBS ${PROJECT_NAME} SUFFIX "
 The module is similar in structure and purpose to [avr_project.cmake](#avr_project.cmake) and
 [stm32_project.cmake](#stm32_project.cmake), but target platform is x86.
 
-### <a name="unit_CMakeLists.txt"
-  href="example/test/CMakeLists.txt">example/test/CMakeLists.txt</a>
+### <a name="unit_CMakeLists.txt" href="example/test/CMakeLists.txt">example/test/CMakeLists.txt</a>
 
 The file specifies what to link the testing executable with and loads
 [test_project.cmake](#test_project.cmake):
@@ -520,14 +517,12 @@ source/header file locations to be included as part of a build for stm32f103c8t6
 See <a href="https://www.freertos.org/Documentation/RTOS_book.html" target="_blank">FreeRTOS
 documentation</a> for details about this interesting OS.
 
-### <a name="gcc_avr_toolchain.cmake"
-  href="cmake/Modules/gcc_avr_toolchain.cmake">gcc_avr_toolchain.cmake</a>
+### <a name="gcc_avr_toolchain.cmake" href="cmake/Modules/gcc_avr_toolchain.cmake">gcc_avr_toolchain.cmake</a>
 
 The module aggregates compiler and linker flags which are required to cross-compile firmware for
 AVR boards.
 
-### <a name="gcc_stm32_toolchain.cmake"
-  href="cmake/Modules/gcc_stm32_toolchain.cmake">gcc_stm32_toolchain.cmake</a>
+### <a name="gcc_stm32_toolchain.cmake" href="cmake/Modules/gcc_stm32_toolchain.cmake">gcc_stm32_toolchain.cmake</a>
 
 The module aggregates compiler and linker flags which are required to cross-compile firmware for
 stm32f103c8t6.
