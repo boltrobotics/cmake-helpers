@@ -1,3 +1,6 @@
+GET_FILENAME_COMPONENT(THIS_FILE_DIR ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
+set(CMAKE_MODULE_PATH ${THIS_FILE_DIR} ${CMAKE_MODULE_PATH})
+
 ##########################################################################
 # "THE ANY BEVERAGE-WARE LICENSE" (Revision 42 - based on beer-ware
 # license):

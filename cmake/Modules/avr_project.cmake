@@ -1,3 +1,4 @@
+message(STATUS "Processing: avr_project.cmake. CMAKE_PROJECT_NAME: ${CMAKE_PROJECT_NAME}")
 include(init)
 
 ####################################################################################################
@@ -40,12 +41,6 @@ function (setup_avr)
   if (NOT AVR_PROGRAMMER)
     set(AVR_PROGRAMMER wiring)
     set(AVR_PROGRAMMER ${AVR_PROGRAMMER} PARENT_SCOPE)
-  endif ()
-
-  if (DEFINED ENV{AVRTOOLS_HOME})
-    set(CMAKE_FIND_ROOT_PATH $ENV{AVRTOOLS_HOME} PARENT_SCOPE)
-  else ()
-    message(FATAL_ERROR "AVRTOOLS_HOME undefined")
   endif ()
 
   # For fuse settings see: $ENV{ARDUINOCOREAVR_HOME}/boards.txt

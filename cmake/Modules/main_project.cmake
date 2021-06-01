@@ -103,6 +103,7 @@ else ()
     endif ()
   endif()
 
+  include(doxygen)
 endif ()
 
 # } stm32, avr, x86
