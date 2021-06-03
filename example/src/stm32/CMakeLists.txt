@@ -24,9 +24,4 @@ list(APPEND SOURCES ${FREERTOS_SOURCES})
 
 # } FreeRTOS
 
-####################################################################################################
-# Build executable {
-
 build_exe(SRCS ${SOURCES} LIBS ${LIBS})
-
-# } Build executable
