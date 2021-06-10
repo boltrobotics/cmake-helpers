@@ -55,7 +55,7 @@ if [ -z ${PROJECTS_HOME} ]; then
   export PROJECTS_HOME="${PWD}/../.."
 fi
 if [ -z ${XTRA_HOME} ]; then
-  export XTRA_HOME=${PROJECTS_HOME}/xtra
+  export XTRA_HOME=${PROJECTS_HOME}/other
 fi
 
 # Bolt Robotics projects
