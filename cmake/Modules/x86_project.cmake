@@ -12,7 +12,10 @@ function (setup_x86)
   )
 
   add_definitions(-DBTR_X86=${BTR_X86})
-  add_compile_options(-Wall -Wextra -Werror)
+
+  if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    add_compile_options(-Wall -Wextra -Werror)
+  endif()
 endfunction ()
 
 # } Standard setup
