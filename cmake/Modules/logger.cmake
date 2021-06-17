@@ -36,7 +36,7 @@ function(add_logger)
   if (p_SCT_DIR)
     set(SCT_DIR "${p_SCT_DIR}")
   else ()
-    set(SCT_DIR "${CMAKE_BINARY_DIR}/scripts")
+    set(SCT_DIR "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/scripts")
   endif ()
   if (NOT EXISTS ${SCT_DIR})
     file(MAKE_DIRECTORY "${SCT_DIR}")
@@ -76,7 +76,7 @@ function(add_logger)
 
   add_custom_target(
     ${PROJECT_NAME}-logging
-    DEPENDS ctpp2c ${SCT_DIR}/${VIEWER_NAME}.py 
+    DEPENDS ${SCT_DIR}/${VIEWER_NAME}.py 
     )
 
   list(APPEND BOLTALOG_SOURCES "${INC_DIR}/${NAME}.hpp" "${SRC_DIR}/${NAME}.cpp")
