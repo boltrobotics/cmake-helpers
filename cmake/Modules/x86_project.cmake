@@ -15,7 +15,7 @@ endif()
 # Build library
 
 function (build_lib)
-  cmake_parse_arguments(p "" "SUFFIX" "OBJS;INC_DIRS;SRCS;LIBS;DEPS" ${ARGN})
+  cmake_parse_arguments(p "" "SUFFIX" "OBJS;SRCS;LIBS;INC_DIRS;DEPS" ${ARGN})
 
   set(TARGET ${PROJECT_NAME}${p_SUFFIX})
   list(LENGTH p_OBJS OBJS_LEN)
@@ -40,6 +40,8 @@ function (build_lib)
       add_library(${TARGET} ${p_LIB_TYPE} $<TARGET_OBJECTS:${TARGET}_o>)
     endif ()
 
+    target_link_libraries(${TARGET} PRIVATE ${p_LIBS})
+
     target_include_directories(${TARGET}_o PRIVATE
       "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"
       "${ROOT_SOURCE_DIR}/src/common"
@@ -47,8 +49,6 @@ function (build_lib)
       "${ROOT_SOURCE_DIR}/include"
       "${p_INC_DIRS}"
     )
-
-    target_link_libraries(${TARGET} PRIVATE ${p_LIBS})
 
   else ()
     message(STATUS "${Yellow}No sources to build${ColourReset}")
@@ -83,6 +83,8 @@ function (build_exe)
       add_executable(${TARGET} ${p_SRCS})
     endif ()
 
+    target_link_libraries(${TARGET} ${p_LIBS})
+
     target_include_directories(${TARGET} PRIVATE
       "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"
       "${ROOT_SOURCE_DIR}/src/common"
@@ -90,8 +92,6 @@ function (build_exe)
       "${ROOT_SOURCE_DIR}/include"
       "${p_INC_DIRS}"
     )
-
-    target_link_libraries(${TARGET} ${p_LIBS})
 
   else ()
     message(STATUS "${Yellow}No sources to build${ColourReset}")

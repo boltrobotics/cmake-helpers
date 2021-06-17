@@ -53,6 +53,10 @@ function (build_tests)
       add_executable(${TARGET} ${p_SRCS})
     endif ()
 
+    set_property(TARGET ${TARGET} PROPERTY install_rpath "@loader_path/../lib")
+    target_link_libraries(${TARGET} ${p_LIBS} ${Boost_LIBRARIES} ${gtest_LIB_NAME})
+    add_test(NAME ${TARGET} COMMAND $<TARGET_FILE:${TARGET}>)
+
     target_include_directories(${TARGET} PRIVATE
       "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"
       "${ROOT_SOURCE_DIR}/src/common"
@@ -60,10 +64,6 @@ function (build_tests)
       "${ROOT_SOURCE_DIR}/include"
       "${p_INC_DIRS}"
     )
-
-    set_property(TARGET ${TARGET} PROPERTY install_rpath "@loader_path/../lib")
-    target_link_libraries(${TARGET} ${p_LIBS} ${Boost_LIBRARIES} ${gtest_LIB_NAME})
-    add_test(NAME ${TARGET} COMMAND $<TARGET_FILE:${TARGET}>)
 
   else ()
     message(STATUS "${BoldYellow}No sources to build: ${TARGET}${ColourReset}")

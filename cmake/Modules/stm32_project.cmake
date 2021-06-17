@@ -8,17 +8,8 @@ endif ()
 ####################################################################################################
 # Standard set up {
 
-function (setup_stm32)
-  include_directories(
-    "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"
-    "${ROOT_SOURCE_DIR}/src/common"
-    "${ROOT_SOURCE_DIR}/include/${PROJECT_NAME}"
-    "${ROOT_SOURCE_DIR}/include"
-  )
-
-  add_definitions(-DBTR_STM32=${BTR_STM32})
-  add_definitions(-DSTM32${STM32_FAMILY})
-endfunction()
+add_definitions(-DBTR_STM32=${BTR_STM32})
+add_definitions(-DSTM32${STM32_FAMILY})
 
 # } Standard setup
 
@@ -26,11 +17,12 @@ endfunction()
 # Build library
 
 function (build_lib)
-  cmake_parse_arguments(p "" "SUFFIX" "OBJS;SRCS;LIBS" ${ARGN})
+  cmake_parse_arguments(p "" "SUFFIX" "OBJS;SRCS;LIBS;INC_DIRS;DEPS" ${ARGN})
 
   set(TARGET ${PROJECT_NAME}${p_SUFFIX})
   list(LENGTH p_OBJS OBJS_LEN)
   list(LENGTH p_SRCS SRCS_LEN)
+  list(LENGTH p_DEPS DEPS_LEN)
 
   if (SRCS_LEN GREATER 0 OR OBJS_LEN GREATER 0)
     message(STATUS "Target: ${TARGET}. Sources: ${p_SRCS}. OBJS: ${p_OBJS}")
@@ -46,10 +38,23 @@ function (build_lib)
     endif ()
 
     target_link_libraries(${TARGET} ${p_LIBS})
+
+    target_include_directories(${TARGET}_o PRIVATE
+      "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"
+      "${ROOT_SOURCE_DIR}/src/common"
+      "${ROOT_SOURCE_DIR}/include/${PROJECT_NAME}"
+      "${ROOT_SOURCE_DIR}/include"
+    )
+
     STM32_SET_TARGET_PROPERTIES(${TARGET})
+
   else ()
     message(STATUS "${Yellow}No sources to build${ColourReset}")
     add_custom_target(${TARGET})
+  endif ()
+
+  if (DEPS_LEN GREATER 0)
+    add_dependencies(${TARGET} ${p_DEPS})
   endif ()
 endfunction ()
 
@@ -59,11 +64,12 @@ endfunction ()
 # Build executable {
 
 function (build_exe)
-  cmake_parse_arguments(p "" "SUFFIX" "OBJS;SRCS;LIBS" ${ARGN})
+  cmake_parse_arguments(p "" "SUFFIX" "OBJS;SRCS;LIBS;INC_DIRS;DEPS" ${ARGN})
 
   set(TARGET ${PROJECT_NAME}${p_SUFFIX})
   list(LENGTH p_SRCS SRCS_LEN)
   list(LENGTH p_OBJS OBJS_LEN)
+  list(LENGTH p_DEPS DEPS_LEN)
 
   if (SRCS_LEN GREATER 0 OR OBJS_LEN GREATER 0)
     message(STATUS "Target: ${TARGET}. Sources: ${p_SRCS}. OBJS: ${p_OBJS}")
@@ -75,6 +81,13 @@ function (build_exe)
     endif ()
 
     target_link_libraries(${TARGET} ${p_LIBS})
+
+    target_include_directories(${TARGET} PRIVATE
+      "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"
+      "${ROOT_SOURCE_DIR}/src/common"
+      "${ROOT_SOURCE_DIR}/include/${PROJECT_NAME}"
+      "${ROOT_SOURCE_DIR}/include"
+    )
 
     # Sets -DSTM32F1 -DSTM32F103xB, -T<linker_script>.
     # Note linker script is copied and renamed to "PROJECT_NAME_flash.ld"
@@ -91,6 +104,9 @@ function (build_exe)
     add_custom_target(${TARGET})
   endif ()
 
+  if (DEPS_LEN GREATER 0)
+    add_dependencies(${TARGET} ${p_DEPS})
+  endif ()
 endfunction ()
 
 # } Build executable 

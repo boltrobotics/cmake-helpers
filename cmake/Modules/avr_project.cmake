@@ -58,13 +58,6 @@ function (setup_avr)
   set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY PARENT_SCOPE)
   set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER PARENT_SCOPE)
 
-  include_directories(
-    "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"
-    "${ROOT_SOURCE_DIR}/src/common"
-    "${ROOT_SOURCE_DIR}/include/${PROJECT_NAME}"
-    "${ROOT_SOURCE_DIR}/include"
-  )
-
   if (CMAKE_BUILD_TYPE MATCHES Release)
     set(CMAKE_C_FLAGS_RELEASE "-Os" PARENT_SCOPE)
     set(CMAKE_CXX_FLAGS_RELEASE "-Os" PARENT_SCOPE)
@@ -95,23 +88,40 @@ endfunction()
 
 function (build_lib)
   setup_gcc_avr_defaults()
-  cmake_parse_arguments(p "" "SUFFIX" "SRCS;LIBS" ${ARGN})
+  cmake_parse_arguments(p "" "SUFFIX" "SRCS;LIBS;INC_DIRS;DEPS" ${ARGN})
 
   set(TARGET ${PROJECT_NAME}${p_SUFFIX})
   list(LENGTH p_SRCS SRCS_LEN)
+  list(LENGTH p_DEPS DEPS_LEN)
 
   if (SRCS_LEN GREATER 0)
     message(STATUS "Target: ${TARGET}. Sources: ${p_SRCS}. OBJS: ${p_OBJS}")
+
     add_avr_library(${TARGET} ${p_SRCS})
 
     if (p_LIBS)
       avr_target_link_libraries(${TARGET} ${p_LIBS})
     endif ()
+
+    get_target_property(TARGET_LIST ${TARGET} OUTPUT_NAME)
+
+    target_include_directories(${TARGET_LIST} PRIVATE
+      "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"
+      "${ROOT_SOURCE_DIR}/src/common"
+      "${ROOT_SOURCE_DIR}/include/${PROJECT_NAME}"
+      "${ROOT_SOURCE_DIR}/include"
+      "${p_INC_DIRS}"
+    )
+
   else ()
     message(STATUS "${Yellow}No sources to build${ColourReset}")
     add_custom_target(${TARGET})
   endif ()
 
+  if (DEPS_LEN GREATER 0)
+    get_target_property(TARGET_LIST ${TARGET} OUTPUT_NAME)
+    add_dependencies(${TARGET_LIST} ${p_DEPS})
+  endif ()
 endfunction ()
 
 ####################################################################################################
@@ -119,10 +129,11 @@ endfunction ()
 
 function (build_exe)
   setup_gcc_avr_defaults()
-  cmake_parse_arguments(p "" "SUFFIX" "SRCS;LIBS" ${ARGN})
+  cmake_parse_arguments(p "" "SUFFIX" "SRCS;LIBS;INC_DIRS;DEPS" ${ARGN})
 
   set(TARGET ${PROJECT_NAME}${EXE_SUFFIX})
   list(LENGTH p_SRCS SRCS_LEN)
+  list(LENGTH p_DEPS DEPS_LEN)
 
   if (SRCS_LEN GREATER 0)
     message(STATUS "AVR_MCU: ${AVR_MCU}")
@@ -138,9 +149,25 @@ function (build_exe)
     if (p_LIBS)
       avr_target_link_libraries(${TARGET} ${p_LIBS})
     endif ()
+
+    get_target_property(TARGET_LIST ${TARGET} OUTPUT_NAME)
+
+    target_include_directories(${TARGET_LIST} PRIVATE
+      "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"
+      "${ROOT_SOURCE_DIR}/src/common"
+      "${ROOT_SOURCE_DIR}/include/${PROJECT_NAME}"
+      "${ROOT_SOURCE_DIR}/include"
+      "${p_INC_DIRS}"
+    )
+
   else ()
     message(STATUS "${Yellow}No sources to build${ColourReset}")
     add_custom_target(${TARGET})
+  endif ()
+
+  if (DEPS_LEN GREATER 0)
+    get_target_property(TARGET_LIST ${TARGET} OUTPUT_NAME)
+    add_dependencies(${TARGET_LIST} ${p_DEPS})
   endif ()
 
   avr_generate_fixed_targets()

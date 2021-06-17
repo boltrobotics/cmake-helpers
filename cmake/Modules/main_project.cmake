@@ -61,7 +61,6 @@ if (BTR_STM32 GREATER 0)
   endif ()
 
   include(stm32_project)
-  setup_stm32()
 
   # Args will be passed to a cmake instance that would use a different toolchain. Specify
   # all arguments including environment variables that the cmake would need.
