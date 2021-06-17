@@ -1,21 +1,25 @@
 function(add_logger)
   cmake_parse_arguments(p "" "INC_DIR;SRC_DIR;SCT_DIR;VIEWER_NAME" "" ${ARGN})
 
-  set(VM "boltalog-autogen")
   set(NAME logger)
+  set(MODEL "${ROOT_SOURCE_DIR}/model/${NAME}.mdl")
   set(TMPL_DIR "$ENV{BOLTALOG_HOME}/template")
   set(BASE "${TMPL_DIR}/${NAME}")
   set(VIEWER_BASE "${TMPL_DIR}/log-viewer")
-  set(MODEL "${ROOT_SOURCE_DIR}/model/${NAME}.mdl")
+  set(VM "boltalog-autogen")
 
   if (NOT EXISTS ${MODEL})
     message(FATAL_ERROR "Model doesn't exist: ${MODEL}")
   endif ()
 
-  if (p_VIEWER_NAME)
-    set(VIEWER_NAME "${p_VIEWER_NAME}")
+  # Include directory
+  if (p_INC_DIR)
+    set(INC_DIR "${p_INC_DIR}")
   else ()
-    set(VIEWER_NAME "${PROJECT_NAME}-log-viewer")
+    set(INC_DIR "${ROOT_SOURCE_DIR}/src/common")
+  endif ()
+  if (NOT EXISTS ${INC_DIR})
+    file(MAKE_DIRECTORY "${INC_DIR}")
   endif ()
 
   # Source directory
@@ -28,16 +32,6 @@ function(add_logger)
     file(MAKE_DIRECTORY "${SRC_DIR}")
   endif ()
 
-  # Include directory
-  if (p_INC_DIR)
-    set(INC_DIR "${p_INC_DIR}")
-  else ()
-    set(INC_DIR "${ROOT_SOURCE_DIR}/include/${PROJECT_NAME}")
-  endif ()
-  if (NOT EXISTS ${INC_DIR})
-    file(MAKE_DIRECTORY "${INC_DIR}")
-  endif ()
-
   # Scripts directory
   if (p_SCT_DIR)
     set(SCT_DIR "${p_SCT_DIR}")
@@ -46,6 +40,12 @@ function(add_logger)
   endif ()
   if (NOT EXISTS ${SCT_DIR})
     file(MAKE_DIRECTORY "${SCT_DIR}")
+  endif ()
+
+  if (p_VIEWER_NAME)
+    set(VIEWER_NAME "${p_VIEWER_NAME}")
+  else ()
+    set(VIEWER_NAME "${PROJECT_NAME}-log-viewer")
   endif ()
 
   # Define custom commands to generate header/source/viewer files
@@ -75,11 +75,12 @@ function(add_logger)
     )
 
   add_custom_target(
-    ${VIEWER_NAME}
-    DEPENDS ctpp2c ${SCT_DIR}/${VIEWER_NAME}.py
+    ${PROJECT_NAME}-logging
+    DEPENDS ctpp2c ${SCT_DIR}/${VIEWER_NAME}.py 
     )
 
   list(APPEND BOLTALOG_SOURCES "${INC_DIR}/${NAME}.hpp" "${SRC_DIR}/${NAME}.cpp")
   set(BOLTALOG_SOURCES "${BOLTALOG_SOURCES}" PARENT_SCOPE)
+  set(BOLTALOG_INC_DIR "${INC_DIR}" PARENT_SCOPE)
 
 endfunction()

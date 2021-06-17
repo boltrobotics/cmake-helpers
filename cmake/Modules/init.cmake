@@ -120,9 +120,9 @@ function (setup_dep NAME HOME)
   cmake_parse_arguments(p "" "INC_DIR;SUB_DIR;LIB_NAME" "" ${ARGN})
 
   if (p_INC_DIR)
-    include_directories(${HOME}/${p_INC_DIR})
+    set(${NAME}_INC_DIR ${HOME}/${p_INC_DIR} PARENT_SCOPE)
   else ()
-    include_directories(${HOME}/include)
+    set(${NAME}_INC_DIR ${HOME}/include PARENT_SCOPE)
   endif ()
 
   if (p_LIB_NAME)
