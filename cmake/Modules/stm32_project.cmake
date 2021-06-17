@@ -44,6 +44,7 @@ function (build_lib)
       "${ROOT_SOURCE_DIR}/src/common"
       "${ROOT_SOURCE_DIR}/include/${PROJECT_NAME}"
       "${ROOT_SOURCE_DIR}/include"
+      "${p_INC_DIRS}"
     )
 
     STM32_SET_TARGET_PROPERTIES(${TARGET})
@@ -87,6 +88,7 @@ function (build_exe)
       "${ROOT_SOURCE_DIR}/src/common"
       "${ROOT_SOURCE_DIR}/include/${PROJECT_NAME}"
       "${ROOT_SOURCE_DIR}/include"
+      "${p_INC_DIRS}"
     )
 
     # Sets -DSTM32F1 -DSTM32F103xB, -T<linker_script>.
