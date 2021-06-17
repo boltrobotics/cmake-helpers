@@ -1,10 +1,10 @@
 include(x86_project)
-setup_x86()
 
 find_package(Threads)
 
 set(LIB_TYPE SHARED)
 find_srcs(FILTER ${MAIN_SRC})
+
 build_lib(SRCS "${SOURCES}" LIBS ${CMAKE_THREAD_LIBS_INIT} )
 build_exe(OBJS "${SOURCES_OBJ}" SRCS "${MAIN_SRC}" LIBS ${PROJECT_NAME} SUFFIX "-exe")
 

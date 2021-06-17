@@ -1,16 +1,13 @@
 include(init)
 
 ####################################################################################################
-# Standard set up {
+# Standard set-up {
 
 add_definitions(-DBTR_X86=${BTR_X86})
 
 if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Werror)
 endif()
-
-function (setup_x86)
-endfunction ()
 
 # } Standard setup
 
