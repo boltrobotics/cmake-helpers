@@ -56,7 +56,7 @@ function (build_lib)
   endif ()
 
   if (DEPS_LEN GREATER 0)
-    add_dependencies(${TARGET} ${p_DEPS})
+    add_dependencies(${TARGET}_o ${p_DEPS})
   endif ()
 
 endfunction ()

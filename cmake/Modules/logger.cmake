@@ -16,7 +16,7 @@ function(add_logger)
   if (p_INC_DIR)
     set(INC_DIR "${p_INC_DIR}")
   else ()
-    set(INC_DIR "${ROOT_SOURCE_DIR}/src/common")
+    set(INC_DIR "${CMAKE_BINARY_DIR}/src/common")
   endif ()
   if (NOT EXISTS ${INC_DIR})
     file(MAKE_DIRECTORY "${INC_DIR}")
@@ -26,7 +26,7 @@ function(add_logger)
   if (p_SRC_DIR)
     set(SRC_DIR "${p_SRC_DIR}")
   else ()
-    set(SRC_DIR "${ROOT_SOURCE_DIR}/src/common")
+    set(SRC_DIR "${CMAKE_BINARY_DIR}/src/common")
   endif ()
   if (NOT EXISTS ${SRC_DIR})
     file(MAKE_DIRECTORY "${SRC_DIR}")
@@ -76,11 +76,10 @@ function(add_logger)
 
   add_custom_target(
     ${PROJECT_NAME}-logging
-    DEPENDS ${SCT_DIR}/${VIEWER_NAME}.py 
+    DEPENDS ${INC_DIR}/${NAME}.hpp ${SCT_DIR}/${VIEWER_NAME}.py 
     )
 
-  list(APPEND BOLTALOG_SOURCES "${INC_DIR}/${NAME}.hpp" "${SRC_DIR}/${NAME}.cpp")
-  set(BOLTALOG_SOURCES "${BOLTALOG_SOURCES}" PARENT_SCOPE)
-  set(BOLTALOG_INC_DIR "${INC_DIR}" PARENT_SCOPE)
+  set(BOLTALOG_SRCS ${SRC_DIR}/${NAME}.cpp PARENT_SCOPE)
+  set(BOLTALOG_INC_DIR ${INC_DIR} PARENT_SCOPE)
 
 endfunction()
