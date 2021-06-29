@@ -1,6 +1,5 @@
 include(project_setup)
 
-find_package(Boost REQUIRED COMPONENTS system thread)
 find_package(GTest)
 
 if (GTest_FOUND)
