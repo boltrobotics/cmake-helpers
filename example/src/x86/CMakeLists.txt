@@ -1,7 +1,5 @@
 include(x86_project)
 
-find_package(Threads)
-
 set(LIB_TYPE SHARED)
 find_srcs(FILTER ${MAIN_SRC})
 

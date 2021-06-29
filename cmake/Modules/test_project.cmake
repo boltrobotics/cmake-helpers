@@ -39,7 +39,7 @@ endfunction ()
 function (build_tests)
   cmake_parse_arguments(p "" "SUFFIX" "OBJS;INC_DIRS;SRCS;LIBS;DEPS" ${ARGN})
 
-  #find_package(Boost COMPONENTS system thread REQUIRED)
+  find_package(Threads REQUIRED)
 
   set(TARGET ${PROJECT_NAME}${p_SUFFIX})
   list(LENGTH p_SRCS SRCS_LEN)
@@ -56,7 +56,8 @@ function (build_tests)
     endif ()
 
     set_property(TARGET ${TARGET} PROPERTY install_rpath "@loader_path/../lib")
-    target_link_libraries(${TARGET} ${p_LIBS} ${gtest_LIB_NAME})
+
+    target_link_libraries(${TARGET} ${p_LIBS} ${gtest_LIB_NAME} ${CMAKE_THREAD_LIBS_INIT})
     add_test(NAME ${TARGET} COMMAND $<TARGET_FILE:${TARGET}>)
 
     target_include_directories(${TARGET} PRIVATE
