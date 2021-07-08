@@ -1,6 +1,10 @@
 include(project_setup)
 
-find_package(GTest)
+# Use this variable to switch between system and local gtest. This is required to fix the
+# error with "relocation truncated to fit R_X86_64_PC32 against `.bss"
+if (GTEST_SYSTEM)
+  find_package(GTest)
+endif ()
 
 if (GTest_FOUND)
   set(gtest_INC_DIR ${GTEST_INCLUDE_DIRS})

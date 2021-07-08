@@ -1,4 +1,4 @@
-include(test_project)
+include(x86_project)
 
 find_test_srcs()
-build_tests(SRCS ${SOURCES} LIBS ${PROJECT_NAME} SUFFIX "-tests")
+build_exe(SRCS ${SOURCES} LIBS ${PROJECT_NAME} SUFFIX "-tests" TEST ON)

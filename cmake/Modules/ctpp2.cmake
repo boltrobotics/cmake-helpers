@@ -26,3 +26,7 @@ ExternalProject_Get_Property(ctpp2_project INSTALL_DIR)
 set(ctpp2_C ${INSTALL_DIR}/bin/ctpp2c)
 set(ctpp2_INC_DIR ${INSTALL_DIR}/include/ctpp2)
 set(ctpp2_LIB ${INSTALL_DIR}/lib/libctpp2.so)
+
+add_library(ctpp2_LIB_DEP SHARED IMPORTED)
+set_property(TARGET ctpp2_LIB_DEP PROPERTY IMPORTED_LOCATION "${ctpp2_LIB}")
+add_dependencies(ctpp2_LIB_DEP ctpp2_project)

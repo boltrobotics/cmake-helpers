@@ -15,7 +15,7 @@ endif()
 # Build library
 
 function (build_lib)
-  cmake_parse_arguments(p "" "SUFFIX" "OBJS;SRCS;LIBS;INC_DIRS;DEPS" ${ARGN})
+  cmake_parse_arguments(p "" "SUFFIX" "OBJS;SRCS;LIBS;INC_DIRS;DEPS;PIC" ${ARGN})
 
   set(TARGET ${PROJECT_NAME}${p_SUFFIX})
   list(LENGTH p_OBJS OBJS_LEN)
@@ -28,11 +28,13 @@ function (build_lib)
     # Build object files
     add_library(${TARGET}_o OBJECT ${p_SRCS})
 
-    if (LIB_TYPE MATCHES SHARED) 
-      set_property(TARGET ${TARGET}_o PROPERTY POSITION_INDEPENDENT_CODE ON)
+    set(SOURCES_OBJ ${TARGET}_o PARENT_SCOPE)
+
+    if (NOT p_PIC)
+      set(p_PIC OFF)
     endif ()
 
-    set(SOURCES_OBJ ${TARGET}_o PARENT_SCOPE)
+    set_property(TARGET ${TARGET}_o PROPERTY POSITION_INDEPENDENT_CODE ${p_PIC})
 
     if (OBJS_LEN GREATER 0)
       add_library(${TARGET} ${p_LIB_TYPE} $<TARGET_OBJECTS:${TARGET}_o> $<TARGET_OBJECTS:${p_OBJS}>)
@@ -67,7 +69,7 @@ endfunction ()
 # Build executable {
 
 function (build_exe)
-  cmake_parse_arguments(p "" "SUFFIX" "OBJS;INC_DIRS;SRCS;LIBS;DEPS" ${ARGN})
+  cmake_parse_arguments(p "" "SUFFIX" "OBJS;INC_DIRS;SRCS;LIBS;DEPS;PIC;TEST" ${ARGN})
 
   set(TARGET ${PROJECT_NAME}${p_SUFFIX})
   list(LENGTH p_SRCS SRCS_LEN)
@@ -83,7 +85,22 @@ function (build_exe)
       add_executable(${TARGET} ${p_SRCS})
     endif ()
 
-    target_link_libraries(${TARGET} ${p_LIBS})
+    if (NOT p_PIC)
+      set_property(TARGET ${TARGET} PROPERTY POSITION_INDEPENDENT_CODE OFF)
+    else ()
+      set_property(TARGET ${TARGET} PROPERTY POSITION_INDEPENDENT_CODE ON)
+    endif ()
+
+    set_property(TARGET ${TARGET} PROPERTY install_rpath "@loader_path/../lib")
+
+    if (p_TEST)
+      include(gtest)
+      find_package(Threads REQUIRED)
+      set(TEST_DEPS ${gtest_LIB_NAME} ${CMAKE_THREAD_LIBS_INIT})
+      add_test(NAME ${TARGET} COMMAND $<TARGET_FILE:${TARGET}>)
+    endif ()
+
+    target_link_libraries(${TARGET} ${p_LIBS} ${TEST_DEPS})
 
     target_include_directories(${TARGET} PRIVATE
       "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"

@@ -114,6 +114,28 @@ endfunction ()
 # } Find sources
 
 ####################################################################################################
+# Find test sources {
+
+function (find_test_srcs)
+  cmake_parse_arguments(p "" "" "FILTER" ${ARGN})
+
+  file(GLOB_RECURSE SOURCES_SCAN
+    "${ROOT_SOURCE_DIR}/test/*.c"
+    "${ROOT_SOURCE_DIR}/test/*.cpp")
+
+  list(LENGTH p_FILTER FILTER_LEN)
+
+  if (FILTER_LEN GREATER 0)
+    message(STATUS  "Exclude test sources: ${p_FILTER}")
+    list(REMOVE_ITEM SOURCES_SCAN ${p_FILTER})
+  endif ()
+
+  set(SOURCES ${SOURCES_SCAN} PARENT_SCOPE)
+endfunction ()
+
+# } Find test sources
+
+####################################################################################################
 # Set up dependency {
 
 function (setup_dep NAME HOME)
