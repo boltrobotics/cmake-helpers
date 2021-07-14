@@ -1,11 +1,12 @@
 include(ctpp2)
 
 function (build_model model_path model_vm tmpl_name src_dir)
-  cmake_parse_arguments(p "" "DEPS" "" ${ARGN})
+  cmake_parse_arguments(p "" "DEPS;SUFFIX" "" ${ARGN})
 
   if (NOT CT2_DIR)
     message(FATAL_ERROR "CT2_DIR is undefined")
   endif ()
+
   if (NOT TMPL_DIR)
     message(FATAL_ERROR "TMPL_DIR is undefined")
   endif ()
@@ -13,16 +14,27 @@ function (build_model model_path model_vm tmpl_name src_dir)
   if (NOT EXISTS ${CT2_DIR}})
     file(MAKE_DIRECTORY ${CT2_DIR})
   endif ()
+
   if (NOT EXISTS ${src_dir}})
     file(MAKE_DIRECTORY ${src_dir})
   endif ()
 
-  set(HPPTMPL_PATH ${TMPL_DIR}/${tmpl_name}.hpptmpl)
-  set(CPPTMPL_PATH ${TMPL_DIR}/${tmpl_name}.cpptmpl)
-  set(HPPCT2_PATH ${CT2_DIR}/${tmpl_name}.hppct2)
-  set(CPPCT2_PATH ${CT2_DIR}/${tmpl_name}.cppct2)
-  set(HPP_PATH ${src_dir}/${tmpl_name}.hpp)
-  set(CPP_PATH ${src_dir}/${tmpl_name}.cpp)
+  get_filename_component(MODEL_NAME ${model_path} NAME_WE)
+  set(MODEL_NAME "${MODEL_NAME}${p_SUFFIX}")
+
+  set(HPPTMPL_PATH_SRC ${TMPL_DIR}/${tmpl_name}.hpptmpl)
+  set(CPPTMPL_PATH_SRC ${TMPL_DIR}/${tmpl_name}.cpptmpl)
+  set(HPPTMPL_PATH ${CMAKE_CURRENT_BINARY_DIR}/${tmpl_name}.hpptmpl)
+  set(CPPTMPL_PATH ${CMAKE_CURRENT_BINARY_DIR}/${tmpl_name}.cpptmpl)
+  set(HPPCT2_PATH ${CT2_DIR}/${MODEL_NAME}.hppct2)
+  set(CPPCT2_PATH ${CT2_DIR}/${MODEL_NAME}.cppct2)
+  set(HPP_PATH ${src_dir}/${MODEL_NAME}.hpp)
+  set(CPP_PATH ${src_dir}/${MODEL_NAME}.cpp)
+
+  # Need to replace year, include file name with the name of the model
+  string(TIMESTAMP YEAR "%Y")
+  configure_file(${HPPTMPL_PATH_SRC} ${HPPTMPL_PATH})
+  configure_file(${CPPTMPL_PATH_SRC} ${CPPTMPL_PATH})
 
   add_custom_command(
     OUTPUT ${HPPCT2_PATH}
@@ -56,9 +68,9 @@ function (build_model model_path model_vm tmpl_name src_dir)
     DEPENDS ${model_vm} ${CPPCT2_PATH} ${model_path} 
     )
 
-  # Executable, library, or other target would add dependency on ${tmpl_name}-tmpl
-  #
-  add_custom_target(${tmpl_name}-tmpl
+  # Executable, library, or other target would add dependency on this custom target
+  add_custom_target(
+    ${PROJECT_NAME}-${MODEL_NAME}-model
     DEPENDS ctpp2_project ${HPP_PATH} ${CPP_PATH}
     )
 
