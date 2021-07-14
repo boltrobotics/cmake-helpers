@@ -68,10 +68,11 @@ function (build_model model_path model_vm tmpl_name src_dir)
     DEPENDS ${model_vm} ${CPPCT2_PATH} ${model_path} 
     )
 
-  # Executable, library, or other target would add dependency on this custom target
-  add_custom_target(
-    ${PROJECT_NAME}-${MODEL_NAME}-model
-    DEPENDS ctpp2_project ${HPP_PATH} ${CPP_PATH}
-    )
+  if (NOT TARGET ${MODEL_NAME}-model)
+    add_custom_target(
+      ${MODEL_NAME}-model
+      DEPENDS ctpp2_project ${HPP_PATH} ${CPP_PATH}
+      )
+  endif ()
 
 endfunction ()

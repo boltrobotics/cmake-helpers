@@ -15,9 +15,14 @@ endif()
 # Build library
 
 function (build_lib)
-  cmake_parse_arguments(p "" "SUFFIX" "OBJS;SRCS;LIBS;INC_DIRS;DEPS;PIC" ${ARGN})
+  cmake_parse_arguments(p "" "TARGET;SUFFIX" "OBJS;SRCS;LIBS;INC_DIRS;DEPS;PIC" ${ARGN})
 
-  set(TARGET ${PROJECT_NAME}${p_SUFFIX})
+  if (p_TARGET)
+    set(TARGET ${p_TARGET})
+  else ()
+    set(TARGET ${PROJECT_NAME}${p_SUFFIX})
+  endif ()
+
   list(LENGTH p_OBJS OBJS_LEN)
   list(LENGTH p_SRCS SRCS_LEN)
   list(LENGTH p_DEPS DEPS_LEN)
@@ -69,9 +74,14 @@ endfunction ()
 # Build executable {
 
 function (build_exe)
-  cmake_parse_arguments(p "" "SUFFIX" "OBJS;INC_DIRS;SRCS;LIBS;DEPS;PIC;TEST" ${ARGN})
+  cmake_parse_arguments(p "" "TARGET;SUFFIX" "OBJS;INC_DIRS;SRCS;LIBS;DEPS;PIC;TEST" ${ARGN})
 
-  set(TARGET ${PROJECT_NAME}${p_SUFFIX})
+  if (p_TARGET)
+    set(TARGET ${p_TARGET})
+  else ()
+    set(TARGET ${PROJECT_NAME}${p_SUFFIX})
+  endif ()
+
   list(LENGTH p_SRCS SRCS_LEN)
   list(LENGTH p_OBJS OBJS_LEN)
   list(LENGTH p_DEPS DEPS_LEN)
