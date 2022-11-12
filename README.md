@@ -5,4 +5,4 @@ reuse working solutions in different projects and minimize duplicate work such a
 * Enabling of unit testing on x86 platform for embedded platform code 
 * Re-typing boilerplate code around initialization and checks
 
-Wiki: <a href="https://sknet.cc/projects/cmake-helpers/">sknet.cc/projects/cmake-helpers</a>
+Wiki: <a href="https://boltrobotics.com/projects/cmake-helpers/">boltrobotics.com/projects/cmake-helpers</a>
