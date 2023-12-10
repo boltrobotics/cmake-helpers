@@ -1,4 +1,4 @@
-message(STATUS "Processing: stm32_project.cmake. CMAKE_PROJECT_NAME: ${CMAKE_PROJECT_NAME}")
+message(STATUS "Processing: stm32_project.cmake")
 include(init)
 
 if (PRINT_FLAGS)

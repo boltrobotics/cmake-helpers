@@ -1,4 +1,4 @@
-message(STATUS "Processing: avr_project.cmake. CMAKE_PROJECT_NAME: ${CMAKE_PROJECT_NAME}")
+message(STATUS "Processing: avr_project.cmake")
 include(init)
 
 ####################################################################################################
@@ -24,23 +24,11 @@ endmacro ()
 # defined by the executable. If only building a library, define those variables.
 #
 function (setup_avr)
-  if (NOT AVR_MCU)
-    set(AVR_MCU atmega328p)
-  endif ()
-  set(AVR_MCU ${AVR_MCU} PARENT_SCOPE)
+  setup_gcc_avr_defaults()
 
   if (NOT MCU_SPEED)
     set(MCU_SPEED "16000000UL")
-  endif ()
-  set(MCU_SPEED ${MCU_SPEED} PARENT_SCOPE)
-
-  if (NOT AVR_UPLOADTOOL_PORT)
-    message(FATAL_ERROR "AVR_UPLOADTOOL_PORT undefined")
-  endif ()
-
-  if (NOT AVR_PROGRAMMER)
-    set(AVR_PROGRAMMER wiring)
-    set(AVR_PROGRAMMER ${AVR_PROGRAMMER} PARENT_SCOPE)
+    set(MCU_SPEED ${MCU_SPEED} PARENT_SCOPE)
   endif ()
 
   # For fuse settings see: $ENV{ARDUINOCOREAVR_HOME}/boards.txt

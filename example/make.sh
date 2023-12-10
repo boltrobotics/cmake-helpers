@@ -91,24 +91,27 @@ fi
 
 if [ ${X86} -eq 1 ]; then
   (cd ${CMAKEHELPERS_HOME}/example \
-    && mkdir -p "build-x86" \
-    && cd "build-x86" \
-    && cmake -DBTR_X86=1 ${TESTS} "$@" .. \
-    && make)
+    && mkdir -p build-x86 \
+    && cd build-x86 \
+    && cmake -G Ninja -DBTR_X86=1 ${TESTS} "$@" .. \
+    && cmake --build .
+  )
 fi
 
 if [ ${STM32} -eq 1 ]; then
   (cd ${CMAKEHELPERS_HOME}/example \
-    && mkdir -p "build-stm32" \
-    && cd "build-stm32" \
-    && cmake -DBTR_STM32=1 "$@" .. \
-    && make)
+    && mkdir -p build-stm32 \
+    && cd build-stm32 \
+    && cmake -G Ninja -DBTR_STM32=1 ${TESTS} "$@" .. \
+    && cmake --build .
+  )
 fi
 
 if [ ${AVR} -eq 1 ]; then
   (cd ${CMAKEHELPERS_HOME}/example \
-    && mkdir -p "build-avr" \
-    && cd "build-avr" \
-    && cmake -DBTR_AVR=1 "$@" .. \
-    && make)
+    && mkdir -p build-avr \
+    && cd build-avr \
+    && cmake -G Ninja -DBTR_AVR=1 ${TESTS} "$@" .. \
+    && cmake --build .
+  )
 fi

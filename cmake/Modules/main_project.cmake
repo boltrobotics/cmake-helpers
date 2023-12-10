@@ -1,6 +1,12 @@
-message(STATUS "Processing: main_project.cmake. CMAKE_PROJECT_NAME: ${CMAKE_PROJECT_NAME}")
+message(STATUS "Processing: main_project.cmake")
 include(init)
 include(firmware)
+
+message(STATUS "PROJECT_NAME: ${PROJECT_NAME}")
+message(STATUS "CMAKE_PROJECT_NAME: ${CMAKE_PROJECT_NAME}")
+message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+message(STATUS "ROOT_SOURCE_DIR: ${ROOT_SOURCE_DIR}")
+message(STATUS "OUTPUT_PATH: ${OUTPUT_PATH}")
 
 ####################################################################################################
 # stm32, avr, x86 {

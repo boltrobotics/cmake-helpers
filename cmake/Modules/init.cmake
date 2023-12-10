@@ -1,4 +1,4 @@
-message(STATUS "Processing: init.cmake. CMAKE_PROJECT_NAME: ${CMAKE_PROJECT_NAME}")
+message(STATUS "Processing: init.cmake")
 
 if (NOT WIN32)
   string(ASCII 27 Esc)
@@ -20,18 +20,18 @@ if (NOT WIN32)
   set(BoldWhite   "${Esc}[1;37m")
 endif()
 
+if (SUBPROJECT_NAME)
+  project(${SUBPROJECT_NAME})
+else ()
+  project(${PROJECT_NAME})
+endif ()
+
 if (NOT CMAKE_C_STANDARD)
   set(CMAKE_C_STANDARD 99)
 endif ()
 
 if (NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 14)
-endif ()
-
-if (SUBPROJECT_NAME)
-  project(${SUBPROJECT_NAME})
-else ()
-  project(${PROJECT_NAME})
 endif ()
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -65,10 +65,6 @@ endif ()
 set(EXECUTABLE_OUTPUT_PATH "${OUTPUT_PATH}/bin")
 set(LIBRARY_OUTPUT_PATH "${OUTPUT_PATH}/lib")
 set(MAIN_SRC ${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}/main.cpp)
-
-message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
-message(STATUS "ROOT_SOURCE_DIR: ${ROOT_SOURCE_DIR}")
-message(STATUS "OUTPUT_PATH: ${OUTPUT_PATH}")
 
 include(doxygen)
 
