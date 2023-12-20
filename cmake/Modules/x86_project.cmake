@@ -15,12 +15,19 @@ endif()
 # Build library
 
 function (build_lib)
-  cmake_parse_arguments(p "" "TARGET;SUFFIX" "OBJS;SRCS;LIBS;INC_DIRS;DEPS;PIC" ${ARGN})
+  cmake_parse_arguments(
+    p "" "TARGET;SUFFIX;LINK_LIBS_VISI;INC_DIR_VISI" "OBJS;SRCS;LIBS;INC_DIRS;DEPS;PIC" ${ARGN})
 
   if (p_TARGET)
     set(TARGET ${p_TARGET})
   else ()
     set(TARGET ${PROJECT_NAME}${p_SUFFIX})
+  endif ()
+  if (NOT p_LINK_LIBS_VISI)
+    set(p_LINK_LIBS_VISI PRIVATE)
+  endif ()
+  if (NOT p_INC_DIR_VISI)
+    set(p_INC_DIR_VISI PRIVATE)
   endif ()
 
   list(LENGTH p_OBJS OBJS_LEN)
@@ -42,14 +49,14 @@ function (build_lib)
     set_property(TARGET ${TARGET}_o PROPERTY POSITION_INDEPENDENT_CODE ${p_PIC})
 
     if (OBJS_LEN GREATER 0)
-      add_library(${TARGET} ${p_LIB_TYPE} $<TARGET_OBJECTS:${TARGET}_o> $<TARGET_OBJECTS:${p_OBJS}>)
+      add_library(${TARGET} $<TARGET_OBJECTS:${TARGET}_o> $<TARGET_OBJECTS:${p_OBJS}>)
     else ()
-      add_library(${TARGET} ${p_LIB_TYPE} $<TARGET_OBJECTS:${TARGET}_o>)
+      add_library(${TARGET} $<TARGET_OBJECTS:${TARGET}_o>)
     endif ()
 
-    target_link_libraries(${TARGET} PRIVATE ${p_LIBS})
+    target_link_libraries(${TARGET} ${p_LINK_LIBS_VISI} ${p_LIBS})
 
-    target_include_directories(${TARGET}_o PRIVATE
+    target_include_directories(${TARGET}_o ${p_INC_DIR_VISI} 
       "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"
       "${ROOT_SOURCE_DIR}/src/common"
       "${ROOT_SOURCE_DIR}/include/${PROJECT_NAME}"
@@ -74,12 +81,19 @@ endfunction ()
 # Build executable {
 
 function (build_exe)
-  cmake_parse_arguments(p "" "TARGET;SUFFIX" "OBJS;INC_DIRS;SRCS;LIBS;DEPS;PIC;TEST" ${ARGN})
+  cmake_parse_arguments(
+    p "" "TARGET;SUFFIX;LINK_LIBS_VISI;INC_DIR_VISI" "OBJS;SRCS;LIBS;INC_DIRS;DEPS;PIC;TEST" ${ARGN})
 
   if (p_TARGET)
     set(TARGET ${p_TARGET})
   else ()
     set(TARGET ${PROJECT_NAME}${p_SUFFIX})
+  endif ()
+  if (NOT p_LINK_LIBS_VISI)
+    set(p_LINK_LIBS_VISI PRIVATE)
+  endif ()
+  if (NOT p_INC_DIR_VISI)
+    set(p_INC_DIR_VISI PRIVATE)
   endif ()
 
   list(LENGTH p_SRCS SRCS_LEN)
@@ -110,9 +124,9 @@ function (build_exe)
       add_test(NAME ${TARGET} COMMAND $<TARGET_FILE:${TARGET}>)
     endif ()
 
-    target_link_libraries(${TARGET} ${p_LIBS} ${TEST_DEPS})
+    target_link_libraries(${TARGET} ${p_LINK_LIBS_VISI} ${p_LIBS} ${TEST_DEPS})
 
-    target_include_directories(${TARGET} PRIVATE
+    target_include_directories(${TARGET} ${p_INC_DIR_VISI}
       "${ROOT_SOURCE_DIR}/src/${BOARD_FAMILY}"
       "${ROOT_SOURCE_DIR}/src/common"
       "${ROOT_SOURCE_DIR}/include/${PROJECT_NAME}"
