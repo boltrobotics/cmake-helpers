@@ -36,9 +36,9 @@ void blink(uint32_t count)
 
 extern "C" {
 
-void vApplicationStackOverflowHook(xTaskHandle *pxTask, signed portCHAR *pcTaskName)
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char* pcTaskName)
 {
-  (void) pxTask;
+  (void) xTask;
   (void) pcTaskName;
 
   for (;;) {

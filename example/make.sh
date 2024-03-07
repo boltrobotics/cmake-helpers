@@ -1,10 +1,18 @@
 #!/bin/bash
 
+X86=0
+STM32=0
+ESP32=0
+AVR=0
+DEPS=0
+TESTS=""
+
 help()
 {
-  echo -e "Usage: `basename $0` [-x] [-s] [-a] [-d] [-t] [-p _projects_home_] [-h]"
+  echo -e "Usage: `basename $0` [-x] [-s] [-e] [-a] [-d] [-t] [-p _projects_home_] [-h]"
   echo -e "  -x - build x86"
   echo -e "  -s - build stm32"
+  echo -e "  -e - build esp32"
   echo -e "  -a - build avr"
   echo -e "  -d - pull dependencies"
   echo -e "  -t - enable unit tests"
@@ -25,17 +33,12 @@ function clone_or_pull {
   fi
 }
 
-X86=0
-STM32=0
-AVR=0
-DEPS=0
-TESTS=""
-
-while getopts "xsadtp:h" Option
+while getopts "xseadtp:h" Option
 do
   case $Option in
     x) X86=1;;
     s) STM32=1;;
+    e) ESP32=1;;
     a) AVR=1;;
     d) DEPS=1;;
     t) TESTS="-DENABLE_TESTS=ON";;
@@ -76,7 +79,7 @@ if [ -z ${SPDLOG_HOME} ]; then
   export SPDLOG_HOME=${XTRA_HOME}/spdlog
 fi
 if [ -z ${FREERTOS_HOME} ]; then
-  export FREERTOS_HOME=${XTRA_HOME}/FreeRTOSv10.1.1
+  export FREERTOS_HOME=${XTRA_HOME}/freertos
 fi
 if [ -z ${LIBOPENCM3_HOME} ]; then
   export LIBOPENCM3_HOME=${XTRA_HOME}/libopencm3
@@ -87,6 +90,7 @@ fi
 if [ "${DEPS}" -eq 1 ]; then
   clone_or_pull "${GTEST_HOME}" "https://github.com/google/googletest.git"
   clone_or_pull "${LIBOPENCM3_HOME}" "https://github.com/libopencm3/libopencm3.git"
+  clone_or_pull "${FREERTOS_HOME}" "https://github.com/FreeRTOS/FreeRTOS-Kernel.git"
 fi
 
 if [ ${X86} -eq 1 ]; then
@@ -103,6 +107,15 @@ if [ ${STM32} -eq 1 ]; then
     && mkdir -p build-stm32 \
     && cd build-stm32 \
     && cmake -G Ninja -DBTR_STM32=1 ${TESTS} "$@" .. \
+    && cmake --build .
+  )
+fi
+
+if [ ${ESP32} -eq 1 ]; then
+  (cd ${CMAKEHELPERS_HOME}/example \
+    && mkdir -p build-esp32 \
+    && cd build-esp32 \
+    && cmake -G Ninja -DBTR_ESP32=1 ${TESTS} "$@" .. \
     && cmake --build .
   )
 fi
