@@ -146,7 +146,7 @@ make example-flash
 
 The following sections describe the functionality in a context of the example project above.
 
-<a name="make.sh">
+<a name="make.sh"></a>
 ### <a href="example/make.sh">example/make.sh</a>
 
 The script makes it convenient to set up the environment and pass the required parameters to cmake.
@@ -192,7 +192,7 @@ process
 The flag instructs to build unit tests. Must also specify "-x" when unit tests are made to run
 on x86
 
-<a name="CMakeLists.txt" /> 
+<a name="CMakeLists.txt"></a> 
 ### <a href="example/CMakeLists.txt">example/CMakeLists.txt</a>
 
 The file sets up project's name, root directory and module path. It then tells cmake to process
@@ -205,7 +205,7 @@ set(ROOT_SOURCE_DIR ${PROJECT_SOURCE_DIR})
 include(main_project)
 ```
 
-<a name="avr_CMakeLists.txt" />
+<a name="avr_CMakeLists.txt"></a>
 ### <a href="example/src/avr/CMakeLists.txt">example/src/avr/CMakeLists.txt</a>
 
 Cmake processes this file after it determined to build for AVR in
@@ -231,7 +231,7 @@ find_srcs()
 build_exe(SRCS ${SOURCES})
 ```
 
-<a name="stm32_CMakeLists.txt" />
+<a name="stm32_CMakeLists.txt"></a>
 ### <a href="example/src/stm32/CMakeLists.txt">example/src/stm32/CMakeLists.txt</a>
 
 The same logic described for AVR above, applies here to STM32. There are additional steps that
@@ -261,7 +261,7 @@ include(freertos)
 build_exe(SRCS ${SOURCES} LIBS ${LIBS})
 ```
 
-<a name="x86_CMakeLists.txt" />
+<a name="x86_CMakeLists.txt" ></a>
 ### <a href="example/src/x86/CMakeLists.txt">example/src/x86/CMakeLists.txt</a>
 
 The file instructs cmake to build a library/executable for x86 platform. The required parameters
@@ -276,7 +276,7 @@ build_lib(SRCS "${SOURCES}" LIBS ${CMAKE_THREAD_LIBS_INIT})
 build_exe(OBJS "${SOURCES_OBJ}" SRCS "${MAIN_SRC}" LIBS ${PROJECT_NAME} SUFFIX "-exe")
 ```
 
-<a name="unit_CMakeLists.txt" />
+<a name="unit_CMakeLists.txt" ></a>
 ### <a href="example/test/CMakeLists.txt">example/test/CMakeLists.txt</a>
 
 The file tells cmake to build a test executable. The file's logic is the same as for building a
@@ -297,7 +297,7 @@ The project is configured to use Google test framework. The framework is set up 
 <a href="cmake/Modules/gtest.cmake">gtest.cmake</a> and is invoked from
 <a href="cmake/Modules/x86_project.cmake">x86_project.cmake</a><
 
-<a name="main_project.cmake" />
+<a name="main_project.cmake" ></a>
 ### <a href="cmake/Modules/main_project.cmake">main_project.cmake</a>
 
 Cmake initializes common parameters and procedures via [init.cmake](#init.cmake), and
@@ -352,7 +352,7 @@ endif ()
 Functions <i>add_target_confg(), add_target_build(), add_target_flash()</i> are defined in
 <a href="#firmware.cmake">firmware.cmake</a>.
 
-<a name="init.cmake" />
+<a name="init.cmake" ></a>
 ### <a href="cmake/Modules/init.cmake">init.cmake</a>
 
 The file checks and initializes common variables if undefined:
@@ -364,7 +364,7 @@ The file checks and initializes common variables if undefined:
 * CMAKE_RULE_MESSAGES
 * CMAKE_VERBOSE_MAKEFILE
 
-<a name="project_setup.cmake" />
+<a name="project_setup.cmake" ></a>
 ### <a href="cmake/Modules/project_setup.cmake">project_setup.cmake</a>
 
 The module is used to set up external cmake/make project. It involves:
@@ -411,7 +411,7 @@ include_directories(${libopencm3_INC_DIR})
   referred to in cmake by project's name, i.e. _${PREFIX}_. In case of libopencm3, static
   library name for use with stm32f103c8t6 board is <i>libopencm3_stm32f1.a</i>
 
-<a name="project_download.cmake.in" />
+<a name="project_download.cmake.in" ></a>
 ### <a href="cmake/Modules/project_download.cmake.in">project_download.cmake.in</a>
 
 When setting up a new external project using [project_setup.cmake](#project_setup.cmake), this
@@ -433,7 +433,7 @@ ExternalProject_Add(${PREFIX}
 )
 ```
 
-<a name="firmware.cmake" />
+<a name="firmware.cmake" ></a>
 ### <a href="cmake/Modules/firmware.cmake">firmware.cmake</a>
 
 The module defines three functions:
