@@ -78,6 +78,14 @@ function(add_target_flash BIN_DIR BIN_NAME OUT_DIR)
     )
     add_dependencies(${BIN_NAME}-flash ${BIN_NAME})
 
+  elseif (BTR_ESP32 GREATER 0)
+    add_custom_target(
+      ${BIN_NAME}-flash
+      WORKING_DIRECTORY ${OUT_DIR}/bin
+      COMMAND esptool.py --chip ${ESP_TARGET} write_flash @flash_project_args
+    )
+    add_dependencies(${BIN_NAME}-flash ${BIN_NAME})
+
   endif ()
 
 endfunction()

@@ -1,4 +1,5 @@
 # Logs, temp files and databases
+sdkconfig
 screenlog.*
 build-*/
 */doc/html

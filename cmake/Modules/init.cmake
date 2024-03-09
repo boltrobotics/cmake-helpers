@@ -26,20 +26,14 @@ else ()
   project(${PROJECT_NAME})
 endif ()
 
-if (NOT CMAKE_C_STANDARD)
-  set(CMAKE_C_STANDARD 99)
-endif ()
-
-if (NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 14)
-endif ()
-
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set(CMAKE_MACOSX_RPATH 1)
 endif()
 
 if (BTR_STM32 GREATER 0)
   set(BOARD_FAMILY stm32)
+elseif (BTR_ESP32 GREATER 0)
+  set(BOARD_FAMILY esp32)
 elseif (BTR_AVR GREATER 0)
   set(BOARD_FAMILY avr)
 else ()

@@ -18,6 +18,9 @@ function(add_target_config_args)
   if (CMAKE_VERBOSE_MAKEFILE)
     set(CMAKE_VERBOSE_MAKEFILE_D "-DCMAKE_VERBOSE_MAKEFILE=ON")
   endif()
+  if (CMAKE_EXPORT_COMPILE_COMMANDS)
+    set(CMAKE_EXPORT_COMPILE_COMMANDS_D "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON")
+  endif()
 
   # BOARD_FAMILY is set up in init.cmake
   add_target_config(
@@ -31,8 +34,10 @@ function(add_target_config_args)
       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
       -DOUTPUT_PATH=${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}
       -DBOARD_FAMILY=${BOARD_FAMILY}
+      -DCMAKE_MODULE_PATH=$ENV{CMAKEHELPERS_HOME}/cmake/Modules
       ${ENABLE_EXAMPLE_D}
       ${CMAKE_VERBOSE_MAKEFILE_D}
+      ${CMAKE_EXPORT_COMPILE_COMMANDS_D}
       ${ARGN}
   )
 endfunction()
@@ -78,6 +83,32 @@ if (BTR_STM32 GREATER 0)
   add_target_build(${BIN_DIR} ${PROJECT_NAME})
   add_target_flash(${BIN_DIR} ${PROJECT_NAME} ${OUTPUT_PATH} ADDR 0x08000000
     FLASH_SIZE ${STM32_FLASH_SIZE})
+
+elseif (BTR_ESP32 GREATER 0)
+  if (NOT IS_DIRECTORY "${PROJECT_SOURCE_DIR}/src/${BOARD_FAMILY}")
+    message(STATUS "No sources to build for ${BOARD_FAMILY}")
+    return()
+  endif ()
+
+  set(ESP_TARGET $ENV{ESP_TARGET})
+
+  if (NOT ESP_TARGET)
+    set(ESP_TARGET esp32)
+    message(STATUS "ESP_TARGET not set. Default: ${ESP_TARGET}")
+  endif ()
+
+  set(IDF_PATH $ENV{IDF_PATH})
+  set(TOOLCHAIN_FILE ${IDF_PATH}/tools/cmake/toolchain-${ESP_TARGET}.cmake)
+  set(BIN_DIR ${PROJECT_BINARY_DIR}/src/${BOARD_FAMILY})
+
+  if (NOT EXISTS "${TOOLCHAIN_FILE}")
+    message(STATUS "No toolchain: ${TOOLCHAIN_FILE}")
+    return()
+  endif ()
+
+  add_target_config_args(-DBTR_ESP32=${BTR_ESP32} -DESP_TARGET=${ESP_TARGET} -DIDF_PATH=${IDF_PATH})
+  add_target_build(${BIN_DIR} ${PROJECT_NAME})
+  add_target_flash(${BIN_DIR} ${PROJECT_NAME} ${OUTPUT_PATH})
 
 elseif (BTR_AVR GREATER 0)
   if (NOT IS_DIRECTORY "${PROJECT_SOURCE_DIR}/src/${BOARD_FAMILY}")
