@@ -36,11 +36,9 @@ or directly from a developer's website (for example, Arm GNU Embedded Toolchain,
   * [example/CMakeLists.txt](#CMakeLists.txt)
   * [main_project.cmake](#main_project.cmake)
   * [example/src/avr/CMakeLists.txt](#avr_CMakeLists.txt)
-  * [avr_project.cmake](#avr_project.cmake)
+  * [example/src/esp32/CMakeLists.txt](#esp32_CMakeLists.txt)
   * [example/src/stm32/CMakeLists.txt](#stm32_CMakeLists.txt)
-  * [stm32_project.cmake](#stm32_project.cmake)
   * [example/src/x86/CMakeLists.txt](#x86_CMakeLists.txt)
-  * [x86_project.cmake](#x86_project.cmake)
   * [example/test/CMakeLists.txt](#unit_CMakeLists.txt)
   * [test_project.cmake](#test_project.cmake)
   * [gtest.cmake](#gtest.cmake)
@@ -60,6 +58,8 @@ project. Within it:
 
 * src/avr/main.cpp <br>
   Uses AVR-based microcontroller to blink a built-in LED and call a function Example::hello()
+* src/esp32/main.cpp <br>
+  Prints information about the chip, restarts, and keeps repeating the same.
 * src/stm32/main.cpp <br>
   Uses libopencm3 and FreeRTOS to start a task which blinks a built-in LED and calls
   Example::hello() while running on STM32F103C8 microcontroller
@@ -102,15 +102,15 @@ example/
 
 ### Building
 
-[make.sh](#make.sh) is used to start cmake build. To build binaries for all three platforms
-(AVR/STM32/x86) and unit tests, run:
+[make.sh](#make.sh) is used to start cmake build. To build binaries for supported platforms
+and unit tests, run:
 
 ```
 cd example
 ./make.sh -x -e -s -a -t
 ```
 
-The script creates a separate output directory per platform and then calls cmake/make:
+The script creates a separate output directory per platform and then calls cmake:
 
 ```
 example/
@@ -124,35 +124,36 @@ example/
 
 ### Testing
 
-To run an example unit test (defined in <i>test/example_test.cpp</i>), run:
+To run an example unit test (defined in <i>test/example_test.cpp</i>), first run make.sh with -x
+and -t options, then:
 
 ```bash
 cd build-x86
-make test
+ninja test
 ```
 
 ### Uploading
 
 Once the build is complete, upload the firmware from within the target platform directory. For
-example, for avr microcontroller:
+example, for AVR:
 
 ```bash
 cd build-avr
-make example-flash
+ninja example-flash
 ```
 
 <a name="Details"></a>
 # Details
 
-The following sections describe the functionality in a context of the example project above.
+The following sections describe the functionality in a context of the example project.
 
 <a name="make.sh"></a>
 ### <a href="example/make.sh">example/make.sh</a>
 
 The script makes it convenient to set up the environment and pass the required parameters to cmake.
 The parameters include project's home, cmake-helpers' home, locations of dependent
-libraries, target platforms for which to build the project. The script can be adapted to other
-projects by changing the dependencies it refers to:
+libraries, and target platforms for which to build the project. Change dependencies in the
+script to adapt it to other projects
 
 ```bash
 if [ -z ${XTRA_HOME} ]; then
@@ -167,7 +168,7 @@ export FREERTOS_HOME=${XTRA_HOME}/FreeRTOSv10.1.1
 Command line options:
 
 ```bash
-Usage: make.sh [-x] [-a] [-s] [-e] [-d] [-c] [-v] [-l] [-t] [-p _projects_home_] [-h]
+Usage: make.sh [-x] [-a] [-s] [-e] [-d] [-c] [-v] [-t] [-h]
   -x - build x86
   -s - build stm32 (board stm32f103c8t6)
   -e - build esp32
@@ -175,22 +176,20 @@ Usage: make.sh [-x] [-a] [-s] [-e] [-d] [-c] [-v] [-l] [-t] [-p _projects_home_]
   -d - clone or pull dependencies
   -c - export compile commands
   -v - enable verbose output
-  -l - enable examples
   -t - enable unit tests
-  -p - absolute path to projects home
   -h - this help
 ```
 
 * -x, -s, -e, -a<br>
-The flags indicate which platform to build for. Multiple options can be specified. To build unit
-tests, "-x" must also be specified
+The flags indicate which platform to build for. Multiple options can be specified.
 * -d <br>
-The flag instructs to update dependent libraries from GitHub. Alternatively, module
-[project_setup.cmake](#project_setup.cmake) can achieve similar goal but as part of the building
-process
+The flag instructs to clone or pull changes for dependent libraries from GitHub.
+* -c <br>
+Enables CMAKE_EXPORT_COMPILE_COMMANDS for troubleshooting.
+* -v <br>
+Enables CMAKE_VERBOSE_MAKEFILE for verbose output during the build.
 * -t <br>
-The flag instructs to build unit tests. Must also specify "-x" when unit tests are made to run
-on x86
+The flag instructs to build unit tests. Must also specify "-x" to run on x86.
 
 <a name="CMakeLists.txt"></a> 
 ### <a href="example/CMakeLists.txt">example/CMakeLists.txt</a>
@@ -231,10 +230,30 @@ find_srcs()
 build_exe(SRCS ${SOURCES})
 ```
 
+<a name="esp32_CMakeLists.txt"></a>
+### <a href="example/src/esp32/CMakeLists.txt">example/src/esp32/CMakeLists.txt</a>
+
+Similar logic described for AVR applies to ESP32 projects.
+
+* <a href="cmake/Modules/esp32_project.cmake">esp32_project.cmake</a> defines building
+  instructions for ESP32 binaries. The instructions refer to ESP-IDF toolchain.
+
+```
+include(esp32_project)
+find_srcs()
+
+build_exe(
+  SRCS ${SOURCES}
+  ESP_TARGET ${ESP_TARGET}
+  LIBS idf::freertos idf::spi_flash
+  COMPONENTS freertos esptool_py
+  )
+```
+
 <a name="stm32_CMakeLists.txt"></a>
 ### <a href="example/src/stm32/CMakeLists.txt">example/src/stm32/CMakeLists.txt</a>
 
-The same logic described for AVR above, applies here to STM32. There are additional steps that
+Similar logic described for AVR applies to STM32 project. There are additional steps that
 cmake goes through due to additional dependencies.
 
 * <a href="cmake/Modules/stm32_project.cmake">stm32_project.cmake</a> defines building
@@ -264,7 +283,7 @@ build_exe(SRCS ${SOURCES} LIBS ${LIBS})
 <a name="x86_CMakeLists.txt" ></a>
 ### <a href="example/src/x86/CMakeLists.txt">example/src/x86/CMakeLists.txt</a>
 
-The file instructs cmake to build a library/executable for x86 platform. The required parameters
+The file instructs cmake to build library/executable for x86 platform. The required parameters
 are defined in <a href="cmake/Modules/x86_project.cmake">x86_project.cmake</a>:
 
 ```
@@ -289,7 +308,7 @@ find_test_srcs()
 build_exe(SRCS ${SOURCES} LIBS ${PROJECT_NAME} SUFFIX "-tests")
 ```
 
-Here, the file skips the call to <i>setup_x86()</i> as x86 was already configured in
+Here, we don't call <i>setup_x86()</i> as x86 was already configured in
 <a href="#main_project.cmake">main_project.cmake</a> <em>else</em> branch as part of
 <i>add_subdirectory("${PROJECT_SOURCE_DIR}/src/${BOARD_FAMILY}")</i>
 
@@ -305,10 +324,11 @@ Cmake initializes common parameters and procedures via [init.cmake](#init.cmake)
 <i>${BTR_STM32}</i>, <i>${BTR_AVR}</i>, and <i>${BTR_X86}</i>, which are defined and passed by
 [make.sh](#make.sh).
 
-For STM32 and AVR platforms, cmake switches the toolchain and generates a cross-compilation build
-based on the instructions in [stm32/CMakeLists.txt](#stm32_CMakeLists.txt) or
-[avr/CMakeLists.txt](#avr_CMakeLists.txt). Otherwise, cmake continues with the current toolchain
-to generate the build based on [x86/CMakeLists.txt](#x86_CMakeLists.txt) and unit tests based on
+For ESP32/STM32/AVR platforms, cmake switches the toolchain and generates a cross-compilation build
+based on the instructions in [esp32/CMakeLists.txt](#esp32_CMakeLists.txt),
+[stm32/CMakeLists.txt](#stm32_CMakeLists.txt), [avr/CMakeLists.txt](#avr_CMakeLists.txt).
+Otherwise, cmake continues with the current toolchain to generate the build based on
+[x86/CMakeLists.txt](#x86_CMakeLists.txt) and unit tests based on
 [test/CMakeLists.txt](#unit_CMakeLists.txt):
 
 ```cmake
@@ -326,6 +346,18 @@ endfunction()
 if (BTR_STM32 GREATER 0)
   set(TOOLCHAIN_FILE $ENV{CMAKEHELPERS_HOME}/cmake/Modules/gcc_stm32_toolchain.cmake)
   ...
+  add_target_config_args(...)
+  add_target_build(...)
+  add_target_flash(...)
+
+elseif (BTR_ESP32 GREATER 0)
+  if (NOT ESP_TARGET)
+    set(ESP_TARGET esp32)
+  endif ()
+
+  set(IDF_PATH $ENV{IDF_PATH})
+  set(TOOLCHAIN_FILE ${IDF_PATH}/tools/cmake/toolchain-${ESP_TARGET}.cmake)
+  ... 
   add_target_config_args(...)
   add_target_build(...)
   add_target_flash(...)
@@ -368,6 +400,7 @@ The file checks and initializes common variables if undefined:
 ### <a href="cmake/Modules/project_setup.cmake">project_setup.cmake</a>
 
 The module is used to set up external cmake/make project. It involves:
+
 * exporting of source, header and/or built library names and locations
 * adding targets, which are defined by the external project, to global scope
 * downloading the files from external source such as GitHub
