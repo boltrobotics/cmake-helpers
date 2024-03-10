@@ -248,7 +248,7 @@ build_exe(
 ### <a href="example/src/stm32/CMakeLists.txt">example/src/stm32/CMakeLists.txt</a>
 
 Similar logic described for AVR applies to STM32 project. There are additional steps that
-cmake goes through due to additional dependencies.
+cmake goes through due to extra dependencies.
 
 * <a href="cmake/Modules/stm32_project.cmake">stm32_project.cmake</a> defines building
   instructions for STM32 binaries
@@ -303,12 +303,12 @@ build_exe(SRCS ${SOURCES} LIBS ${PROJECT_NAME} SUFFIX "-tests")
 ```
 
 Here, we don't call <i>setup_x86()</i> as x86 was already configured in
-<a href="#main_project.cmake">main_project.cmake</a> <em>else</em> branch as part of
+<a href="#main_project.cmake">main_project.cmake's</a> <em>else</em> branch as part of
 <i>add_subdirectory("${PROJECT_SOURCE_DIR}/src/${BOARD_FAMILY}")</i>
 
 The project is configured to use Google test framework. The framework is set up in
 <a href="cmake/Modules/gtest.cmake">gtest.cmake</a> and is invoked from
-<a href="cmake/Modules/x86_project.cmake">x86_project.cmake</a><
+<a href="cmake/Modules/x86_project.cmake">x86_project.cmake</a>
 
 <a name="main_project.cmake" ></a>
 ### <a href="cmake/Modules/main_project.cmake">main_project.cmake</a>
@@ -345,11 +345,6 @@ if (BTR_STM32 GREATER 0)
   add_target_flash(...)
 
 elseif (BTR_ESP32 GREATER 0)
-  if (NOT ESP_TARGET)
-    set(ESP_TARGET esp32)
-  endif ()
-
-  set(IDF_PATH $ENV{IDF_PATH})
   set(TOOLCHAIN_FILE ${IDF_PATH}/tools/cmake/toolchain-${ESP_TARGET}.cmake)
   ... 
   add_target_config_args(...)
@@ -381,13 +376,8 @@ Functions <i>add_target_confg(), add_target_build(), add_target_flash()</i> are 
 <a name="init.cmake" ></a>
 ### <a href="cmake/Modules/init.cmake">init.cmake</a>
 
-The file checks and initializes common variables if undefined:
-* BOARD_FAMILY
-* CMAKE_BUILD_TYPE
-* EXECUTABLE_OUTPUT_PATH
-* LIBRARY_OUTPUT_PATH
-* CMAKE_RULE_MESSAGES
-* CMAKE_VERBOSE_MAKEFILE
+The file checks and initializes common variables if undefined, for example
+CMAKE_BUILD_TYPE, EXECUTABLE_OUTPUT_PATH, LIBRARY_OUTPUT_PATH, CMAKE_RULE_MESSAGES
 
 <a name="project_setup.cmake" ></a>
 ### <a href="cmake/Modules/project_setup.cmake">project_setup.cmake</a>
