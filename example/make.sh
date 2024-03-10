@@ -19,14 +19,8 @@ fi
 
 # Third-party projects
 
-if [ -z ${CTPP2_HOME} ]; then
-  export CTPP2_HOME=${XTRA_HOME}/ctpp
-fi
 if [ -z ${GTEST_HOME} ]; then
   export GTEST_HOME=${XTRA_HOME}/gtest
-fi
-if [ -z ${SPDLOG_HOME} ]; then
-  export SPDLOG_HOME=${XTRA_HOME}/spdlog
 fi
 if [ -z ${FREERTOS_HOME} ]; then
   export FREERTOS_HOME=${XTRA_HOME}/freertos
@@ -64,22 +58,20 @@ x86=0; avr=0; stm32=0; esp32=0;
 TESTS=""
 VERBOSE=""
 COMPILELOG=""
-EXAMPLE=""
 
 function build()
 {
   (set -x && \
     cd ${CMAKEHELPERS_HOME}/example \
     && mkdir -p build-${1} && cd build-${1} \
-    && cmake -G Ninja -DBTR_${1^^}=1${TESTS}${EXAMPLE}${VERBOSE}${COMPILELOG}"${2}" .. \
+    && cmake -G Ninja -DBTR_${1^^}=1${TESTS}${VERBOSE}${COMPILELOG}"${2}" .. \
     && cmake --build . \
   )
 }
 
 help()
 {
-  echo -e "Usage: `basename $0` [-x] [-a] [-s] [-e] [-d] [-c] [-v] [-l] [-t]" \
-    "[-p _projects_home_] [-h]"
+  echo -e "Usage: `basename $0` [-x] [-a] [-s] [-e] [-d] [-c] [-v] [-t] [-h]"
   echo -e "  -x - build x86"
   echo -e "  -s - build stm32"
   echo -e "  -e - build esp32"
@@ -87,13 +79,11 @@ help()
   echo -e "  -d - clone or pull dependencies"
   echo -e "  -c - export compile commands"
   echo -e "  -v - enable verbose output"
-  echo -e "  -l - enable examples"
   echo -e "  -t - enable unit tests"
-  echo -e "  -p - absolute path to projects home"
   echo -e "  -h - this help"
 }
 
-while getopts "xasedcvltp:h" Option
+while getopts "xasedcvth" Option
 do
   case $Option in
     x) x86=1;;
@@ -103,9 +93,7 @@ do
     d) clone;;
     c) COMPILELOG=" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON";;
     v) VERBOSE=" -DCMAKE_VERBOSE_MAKEFILE=ON";;
-    l) EXAMPLE=" -DENABLE_EXAMPLE=ON";;
     t) TESTS=" -DENABLE_TESTS=ON";;
-    p) PROJECTS_HOME=${OPTARG};;
     h) help; exit 0;;
     \?) help; exit 22;;
   esac
