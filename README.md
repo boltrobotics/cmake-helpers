@@ -40,15 +40,9 @@ or directly from a developer's website (for example, Arm GNU Embedded Toolchain,
   * [example/src/stm32/CMakeLists.txt](#stm32_CMakeLists.txt)
   * [example/src/x86/CMakeLists.txt](#x86_CMakeLists.txt)
   * [example/test/CMakeLists.txt](#unit_CMakeLists.txt)
-  * [test_project.cmake](#test_project.cmake)
-  * [gtest.cmake](#gtest.cmake)
   * [init.cmake](#init.cmake)
   * [project_setup.cmake](#project_setup.cmake)
   * [project_download.cmake.in](#project_download.cmake.in)
-  * [libopencm3.cmake](#libopencm3.cmake)
-  * [freertos.cmake](#freertos.cmake)
-  * [gcc_avr_toolchain.cmake](#gcc_avr_toolchain.cmake)
-  * [gcc_stm32_toolchain.cmake](#gcc_stm32_toolchain.cmake)
   * [firmware.cmake](#firmware.cmake)
 
 # <a name="Example"></a>Example
@@ -392,7 +386,6 @@ The file checks and initializes common variables if undefined:
 * CMAKE_BUILD_TYPE
 * EXECUTABLE_OUTPUT_PATH
 * LIBRARY_OUTPUT_PATH
-* CMAKE_CXX_STANDARD
 * CMAKE_RULE_MESSAGES
 * CMAKE_VERBOSE_MAKEFILE
 
