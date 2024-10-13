@@ -44,6 +44,7 @@ or directly from a developer's website (for example, Arm GNU Embedded Toolchain,
   * [project_setup.cmake](#project_setup.cmake)
   * [project_download.cmake.in](#project_download.cmake.in)
   * [firmware.cmake](#firmware.cmake)
+* [Thanks](#Thanks)
 
 # <a name="Example"></a>Example
 
@@ -465,3 +466,9 @@ The module defines three functions:
   ```bash
   make _project_name_-flash
   ```
+<a name="Thanks" ></a>
+## Thanks
+
+<a href="https://www.buymeacoffee.com/skbuildxyz" target="_blank">
+  <img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174">
+</a>
